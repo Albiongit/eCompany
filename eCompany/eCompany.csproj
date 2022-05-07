@@ -24,6 +24,12 @@
   <ItemGroup>
     <ProjectReference Include="..\eCompany.DataAccess\eCompany.DataAccess.csproj" />
     <ProjectReference Include="..\eCompany.Models\eCompany.Models.csproj" />
+    <ProjectReference Include="..\eCompany.Shared\eCompany.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Admin\Controllers\" />
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>
