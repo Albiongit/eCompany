@@ -6,61 +6,77 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+<div class="row pt-4">
+    <div class="col-md-7">
+        <form id="registerForm" class="row" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data">
             <h2>Create a new account.</h2>
             <hr />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-floating py-2">
-                <input asp-for="Input.Name" class="form-control"  aria-required="true" />
-                <label asp-for="Input.Name"></label>
-                <span asp-validation-for="Input.Name" class="text-danger"></span>
-            </div>
-            <div class="form-floating py-2">
-                <input asp-for="Input.Sex" class="form-control" aria-required="true" />
-                <label asp-for="Input.Sex"></label>
-                <span asp-validation-for="Input.Sex" class="text-danger"></span>
-            </div>
-            <div class="form-floating py-2">
+            <div class="form-floating py-2 col-12">
                 <input asp-for="Input.Email" class="form-control" aria-required="true" />
                 <label asp-for="Input.Email"></label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
-            <div class="form-floating py-2">
+            <div class="form-floating py-2 col-6">
+                <select asp-for="Input.Sex" class="form-select">
+                    <option disabled selected>-Select Sex-</option>
+                    <option value="M">M</option>
+                    <option value="F">F</option>
+                </select>
+                <label asp-for="Input.Sex"></label>
+                <span asp-validation-for="Input.Sex" class="text-danger"></span>
+            </div>
+            <div class="form-floating py-2 col-6">
+                <input asp-for="Input.Name" class="form-control"  aria-required="true" />
+                <label asp-for="Input.Name"></label>
+                <span asp-validation-for="Input.Name" class="text-danger"></span>
+            </div>
+            <div class="form-floating py-2 col-6">
                 <input asp-for="Input.PhoneNumber" class="form-control" aria-required="true" />
                 <label asp-for="Input.PhoneNumber"></label>
                 <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
             </div>
-            <div class="form-floating py-2">
+            <div class="form-floating py-2 col-6">
                 <input asp-for="Input.State" class="form-control" aria-required="true" />
                 <label asp-for="Input.State"></label>
                 <span asp-validation-for="Input.State" class="text-danger"></span>
             </div>
-            <div class="form-floating py-2">
+            <div class="form-floating py-2 col-6">
                 <input asp-for="Input.City" class="form-control" aria-required="true" />
-                <label asp-for="Input.City"></label>
+                <label  asp-for="Input.City"></label>
                 <span asp-validation-for="Input.City" class="text-danger"></span>
             </div>
-            <div class="form-floating py-2">
+            <div class="form-floating py-2 col-6">
                 <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" />
                 <label asp-for="Input.Password"></label>
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
-            <div class="form-floating py-2">
+            <div class="form-floating py-2 col-6">
                 <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" />
                 <label asp-for="Input.ConfirmPassword"></label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
-            <div class="form-floating py-2">
-                <input type="file" name="files" id="uploadBox" multiple class="form-control" />
+            <div class="form-floating py-2 col-6">
+                <input type="file" id="uploadBox" name="file" multiple class="form-control" />
                 <label asp-for="Input.ImageUrl"></label>
-                <span asp-validation-for="Input.ImageUrl" class="text-danger"></span>
+            </div>
+            <div class="form-floating py-2 col-6">
+                <select asp-for="Input.Role" id="Input_Role" asp-items="@Model.Input.RoleList" class="form-select" required>
+                    <option disabled selected>-Select Role-</option>
+                </select>
+                <label asp-for="Input.Role"></label>
+                <span asp-validation-for="Input.Role" class="text-danger"></span>
+            </div>
+            <div class="form-floating py-2 col-6" id="Input_CompanyId" style="display:none">
+                <select asp-for="Input.CompanyId" asp-items="@Model.Input.CompanyList" class="form-select" required>
+                    <option disabled selected>-Select Company-</option>
+                </select>
+                <label asp-for="Input.CompanyId" ></label>
             </div>
             <button id="registerSubmit" type="submit" class="w-100 btn btn-primary">Register</button>
         </form>
     </div>
-    <div class="col-md-6 col-md-offset-2">
+    <div class="col-md-5">
         <section>
             <h3>Use another service to register.</h3>
             <hr />
@@ -94,4 +110,21 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            $('#Input_Role').change(function() {
+                var selection = $('#Input_Role Option:Selected').text();
+                if(selection == "Company Admin"){
+                    $('#Input_CompanyId').show();
+                }
+                else{
+                    if(selection == "Employee"){
+                        $('#Input_CompanyId').show();
+                    }else{
+                        $('#Input_CompanyId').hide();
+                    }
+                }
+            })
+        })
+    </script>
 }

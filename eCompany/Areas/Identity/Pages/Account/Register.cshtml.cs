@@ -4,19 +4,25 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using eCompany.DataAccess.Data;
+using eCompany.DataAccess.Repository.IRepository;
+using eCompany.Models;
 using eCompany.Shared;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
@@ -31,6 +37,9 @@ namespace eCompany.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IWebHostEnvironment _hostEnvironment;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly ApplicationDbContext _db;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
@@ -38,7 +47,10 @@ namespace eCompany.Areas.Identity.Pages.Account
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            IWebHostEnvironment hostEnvironment,
+            IUnitOfWork unitOfWork,
+            ApplicationDbContext db)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -47,6 +59,9 @@ namespace eCompany.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _roleManager = roleManager;
+            _hostEnvironment = hostEnvironment;
+            _unitOfWork = unitOfWork;
+            _db = db;
         }
 
         /// <summary>
@@ -113,6 +128,16 @@ namespace eCompany.Areas.Identity.Pages.Account
             public string? PhoneNumber { get; set; }
 
             public char Sex { get; set; }
+            public string Role { get; set; }
+
+            [DisplayName("Company")]
+            public int CompanyId { get; set; }
+
+            [ValidateNever]
+            public IEnumerable<SelectListItem> RoleList { get; set; }
+
+            [ValidateNever]
+            public IEnumerable<SelectListItem> CompanyList { get; set; }
         }
 
 
@@ -127,9 +152,23 @@ namespace eCompany.Areas.Identity.Pages.Account
             
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            Input = new InputModel()
+            {
+                RoleList = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
+                {
+                    Text = i,
+                    Value = i
+                }),
+
+                CompanyList = _unitOfWork.Company.GetAll().Select(i => new SelectListItem
+                {
+                    Text = i.CompanyName,
+                    Value = i.CompanyId.ToString()
+                })
+            };
         }
 
-        public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+        public async Task<IActionResult> OnPostAsync(string returnUrl = null, IFormFile? file=null)
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
@@ -137,13 +176,63 @@ namespace eCompany.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
+                string wwwRootPath = _hostEnvironment.WebRootPath;
+                if (file != null)
+                {
+                    string fileName = Guid.NewGuid().ToString();
+                    var uploads = Path.Combine(wwwRootPath, @"images\users");
+                    var extension = Path.GetExtension(file.FileName);
+
+                    using (var fileStreams = new FileStream(Path.Combine(uploads, fileName+extension), FileMode.Create))
+                    {
+                        file.CopyTo(fileStreams);
+                    }
+                    user.ImageUrl = @"\images\users\" + fileName + extension;
+
+                }
+                else
+                {
+                    if(Input.Sex == 'M')
+                    {
+                        user.ImageUrl = @"\images\users\maleUser.png";
+                    }
+                    else
+                    {
+                        user.ImageUrl = @"\images\users\femaleUser.png";
+                    }
+                }
+
+
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                user.City = Input.City;
+                user.State = Input.State;
+                user.Name = Input.Name;
+                user.PhoneNumber = Input.PhoneNumber;
+                user.Sex = Input.Sex;
+
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    if(Input.Role != null)
+                    {
+                        await _userManager.AddToRoleAsync(user, Input.Role);
+                    }
+
+                    if (Input.Role != SD.Role_SuperAdmin)
+                    {
+                        await _db.Companies_Users.AddAsync(new Company_User
+                        {
+                            CompanyId = Input.CompanyId,
+                            UserId = user.Id
+                        });
+                        _db.SaveChanges();
+                    }
+
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -177,11 +266,11 @@ namespace eCompany.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private IdentityUser CreateUser()
+        private ApplicationUser CreateUser()
         {
             try
             {
-                return Activator.CreateInstance<IdentityUser>();
+                return Activator.CreateInstance<ApplicationUser>();
             }
             catch
             {

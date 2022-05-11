@@ -1,0 +1,8 @@
+﻿@model eCompany.Models.ApplicationUser
+
+    <li class = "nav-item mr-10">
+        <img src="@Model.ImageUrl" style="border-radius: 50%;" width="40px;" height="40px;" />
+    </li>
+    <li class="nav-item">
+        <a id="manage" class="nav-link text-light" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage"><strong>    @Model.Name</strong></a>
+    </li>
