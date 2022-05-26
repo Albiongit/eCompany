@@ -5,6 +5,7 @@ using eCompany.DataAccess.Repository.IRepository;
 using eCompany.DataAccess.Repository;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using eCompany.Shared;
+using eCompany.Areas.Admin.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection");;
@@ -12,7 +13,9 @@ var connectionString = builder.Configuration.GetConnectionString("ApplicationDbC
 
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")
      ));

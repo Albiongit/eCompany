@@ -13,13 +13,13 @@ namespace eCompany.Models
     {
         [Required]
         public string Name { get; set; }
-
+        [Required]
         public string? State { get; set; }
-
+        [Required]
         public string? City { get; set; }
 
         public string? ImageUrl { get; set; }
-
+        [Required]
         public char Sex { get; set; }
 
 

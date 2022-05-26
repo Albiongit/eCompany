@@ -9,14 +9,14 @@ namespace eCompany.DataAccess.Repository.IRepository
 {
     public interface IRepository<T> where T : class
     {
-        T GetFirstOrDefault(Expression<Func<T, bool>> filter);
+        Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter);
 
-        IEnumerable<T> GetAll();
+        Task<IEnumerable<T>> GetAllAsync();
 
-        void Add(T entity);
+        Task AddAsync(T entity);
 
-        void Remove(T entity);
+        Task RemoveAsync(T entity);
 
-        void RemoveRange(IEnumerable<T> entities);
+        Task RemoveRangeAsync(IEnumerable<T> entities);
     }
 }

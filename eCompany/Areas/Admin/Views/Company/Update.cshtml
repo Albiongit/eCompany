@@ -1,0 +1,60 @@
+﻿@using eCompany.Models.DTOs.Entities
+@model CompanyDTO
+
+<form method="post" asp-action="Upsert" enctype="multipart/form-data">
+	<input asp-for="CompanyId" hidden />
+	
+	<div class="row">
+		<div class="col-10">
+			<div class="border p-3 mt-4 row">
+		<div class="col-12 pb-2">
+			<h2 class="text-primary">Update Company</h2>
+			<hr />
+		</div>
+		<div asp-validation-summary="All"></div>
+		<div class="mb-3">
+			<label asp-for="CompanyName"></label>
+			<input asp-for="CompanyName" class="form-control" />
+			<span asp-validation-for="CompanyName" class="text-danger"></span>
+		</div>
+		<div class="mb-3">
+			<label asp-for="CompanyPhone"></label>
+			<input asp-for="CompanyPhone" class="form-control" />
+			<span asp-validation-for="CompanyPhone" class="text-danger"></span>
+		</div>
+		<div class="mb-3">
+			<label asp-for="CompanyState"></label>
+			<input asp-for="CompanyState" class="form-control" />
+			<span asp-validation-for="CompanyState" class="text-danger"></span>
+		</div>
+		<div class="mb-3">
+			<label asp-for="CompanyWeb"></label>
+			<input asp-for="CompanyWeb" class="form-control" />
+			<span asp-validation-for="CompanyWeb" class="text-danger"></span>
+		</div>
+		
+		<div class="col-12">
+			@if (Model.CompanyId != 0)
+			{
+				<button type="submit" class="btn btn-primary" style="width:150px">Update</button>
+			}
+			else
+			{
+				<button type="submit" class="btn btn-primary" style="width:150px">Create</button>
+			}
+			<a asp-controller="Company" asp-action="Index" class="btn btn-secondary" style="width:150px">
+				Back to List
+			</a>
+		</div>
+
+	</div>
+		</div>
+		
+	</div>
+</form>
+
+@section Scripts{
+	@{
+	<partial name="_ValidationScriptsPartial" />
+	}
+}

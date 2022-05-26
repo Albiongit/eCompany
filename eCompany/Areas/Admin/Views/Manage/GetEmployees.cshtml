@@ -1,0 +1,37 @@
+﻿@using eCompany.Models.DTOs.Entities
+
+@model CompanyDTO
+<div class="container p-3">
+	<div class="row pt-4">
+		<div class="col-6">
+			<h2 class="text-primary">@Model.CompanyName - Employee List</h2>
+		</div>
+		<div class="col-6 text-end">
+			<a id="register" asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary">
+				<i class="bi bi-plus-circle"></i> &nbsp; Add New Employee
+			</a>
+		</div>
+	</div>
+	<br /><br />
+
+	<table id="tblData" data-id="@Model.CompanyId" class="table table-bordered table-striped" style="width:100%">
+		<thead>
+			<tr>
+				<th>Employee Name</th>
+				<th>Sex</th>
+				<th>Email</th>
+				<th>Phone Number</th>
+				<th>State</th>
+				<th>City</th>
+				<th></th>
+			</tr>
+		</thead>
+	</table>
+
+	<a asp-area="Admin" asp-controller="Manage" asp-action="Index" asp-route-id="@Model.CompanyId" type="button" class="btn btn-primary btn-lg btn-block">Back to list</a>
+        
+</div>
+
+@section Scripts{
+<script src="~/js/manageEmployee.js"></script>
+}

@@ -1,0 +1,52 @@
+﻿@using eCompany.Models.DTOs.Entities
+@model CompanyDTO
+
+
+    
+		<form method="post" asp-controller="Company" asp-action="Update" enctype="multipart/form-data">
+			<input asp-for="CompanyId" hidden />
+			<div class="row p-3 border">
+				<h3>Update Company</h3>
+				<div asp-validation-summary="All"></div>
+				<div class="col-8 pt-4">
+					<div class="form-floating">
+						<input asp-for="CompanyName" class="form-control" />
+						<label asp-for="CompanyName" class="form-label"></label>
+						<span asp-validation-for="CompanyName" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="col-8 pt-4">
+					<div class="form-floating">
+						<input asp-for="CompanyPhone" class="form-control" />
+						<label asp-for="CompanyPhone" class="form-label"></label>
+						<span asp-validation-for="CompanyPhone" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="col-8 pt-4">
+					<div class="form-floating">
+						<input asp-for="CompanyState" class="form-control" />
+						<label asp-for="CompanyState" class="form-label"></label>
+						<span asp-validation-for="CompanyState" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="col-8 pt-4">
+					<div class="form-floating">
+						<input asp-for="CompanyWeb" class="form-control" />
+						<label asp-for="CompanyWeb" class="form-label"></label>
+						<span asp-validation-for="CompanyWeb" class="text-danger"></span>
+					</div>
+				</div>
+				<br />
+				<div class="col-12 pt-4">
+				
+					<button type="submit" class="btn btn-primary" style="width:150px">Update</button>
+					
+					<a asp-controller="Company" asp-action="Index" class="btn btn-secondary" style="width:150px">
+						Back to List
+					</a>
+				</div>
+
+			</div>
+			
+		</form>
+	

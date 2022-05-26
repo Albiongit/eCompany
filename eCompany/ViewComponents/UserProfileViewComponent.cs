@@ -4,10 +4,12 @@ using System.Security.Claims;
 
 namespace eCompany.ViewComponents
 {
+    [ViewComponent(Name = "UserProfile")]
     public class UserProfileViewComponent : ViewComponent
     {
         private readonly IUnitOfWork _unitOfWork;
 
+       
         public UserProfileViewComponent(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
@@ -18,7 +20,7 @@ namespace eCompany.ViewComponents
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
 
-            var UserFromDb = _unitOfWork.ApplicationUser.GetFirstOrDefault(x => x.Id == claim.Value);
+            var UserFromDb = await _unitOfWork.ApplicationUser.GetFirstOrDefaultAsync(x => x.Id == claim.Value);
 
             return View(UserFromDb);
         }

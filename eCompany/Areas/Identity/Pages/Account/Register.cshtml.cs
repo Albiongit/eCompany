@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
@@ -41,6 +42,8 @@ namespace eCompany.Areas.Identity.Pages.Account
         private readonly IUnitOfWork _unitOfWork;
         private readonly ApplicationDbContext _db;
 
+        
+
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
@@ -63,6 +66,8 @@ namespace eCompany.Areas.Identity.Pages.Account
             _unitOfWork = unitOfWork;
             _db = db;
         }
+
+        
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -112,6 +117,7 @@ namespace eCompany.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
+            [Required]
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
@@ -119,15 +125,17 @@ namespace eCompany.Areas.Identity.Pages.Account
 
             [Required]
             public string Name { get; set; }
-
+            [Required]
             public string? State { get; set; }
-
+            [Required]
             public string? City { get; set; }
 
             public string? ImageUrl { get; set; }
+            [Required]
             public string? PhoneNumber { get; set; }
-
+            [Required]
             public char Sex { get; set; }
+            [Required]
             public string Role { get; set; }
 
             [DisplayName("Company")]
@@ -143,32 +151,134 @@ namespace eCompany.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
+            // admin identification
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
             if (!_roleManager.RoleExistsAsync(SD.Role_SuperAdmin).GetAwaiter().GetResult())
             {
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_SuperAdmin)).GetAwaiter().GetResult();
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_Admin)).GetAwaiter().GetResult();
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_Employee)).GetAwaiter().GetResult();
             }
-            
-            ReturnUrl = returnUrl;
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            Input = new InputModel()
-            {
-                RoleList = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
-                {
-                    Text = i,
-                    Value = i
-                }),
 
-                CompanyList = _unitOfWork.Company.GetAll().Select(i => new SelectListItem
+            //Checking for company admin
+            if (claim?.Value == null)
+            {
+
+                ReturnUrl = returnUrl;
+                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                var companyLista = await _unitOfWork.Company.GetAllAsync();
+
+                Input = new InputModel()
                 {
-                    Text = i.CompanyName,
-                    Value = i.CompanyId.ToString()
-                })
-            };
+                    RoleList = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
+                    {
+                        Text = i,
+                        Value = i
+                    }),
+
+
+                    CompanyList = companyLista.Select(i => new SelectListItem
+                    {
+                        Text = i.CompanyName,
+                        Value = i.CompanyId.ToString()
+                    })
+                };
+
+            }
+            else
+            {
+
+                var userCompany = await _unitOfWork.CompanyUsers.GetFirstOrDefaultAsync(uc => uc.UserId == claim.Value);
+
+
+                if (userCompany != null)
+                {
+                    //Company Admin
+
+                    var useri = new IdentityUser
+                    {
+                        Id = userCompany.UserId
+                    };
+
+                    var companyAdminStatus = await _userManager.IsInRoleAsync(useri, SD.Role_Admin);
+
+                    if (companyAdminStatus)
+                    {
+                        ReturnUrl = returnUrl;
+                        ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                        var companyLista = await _unitOfWork.Company.GetAllAsync();
+
+                        Input = new InputModel()
+                        {
+                            RoleList = _roleManager.Roles.Where(r => r.Name != SD.Role_SuperAdmin).Select(x => x.Name).Select(i => new SelectListItem
+                            {
+                                Text = i,
+                                Value = i
+                            }),
+
+
+                            CompanyList = companyLista.Where(x => x.CompanyId == userCompany.CompanyId).Select(i => new SelectListItem
+                            {
+                                Text = i.CompanyName,
+                                Value = i.CompanyId.ToString()
+                            })
+                        };
+                    }
+                    else
+                    {
+                        ReturnUrl = returnUrl;
+                        ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                        var companyLista = await _unitOfWork.Company.GetAllAsync();
+
+                        Input = new InputModel()
+                        {
+                            RoleList = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
+                            {
+                                Text = i,
+                                Value = i
+                            }),
+
+
+                            CompanyList = companyLista.Select(i => new SelectListItem
+                            {
+                                Text = i.CompanyName,
+                                Value = i.CompanyId.ToString()
+                            })
+                        };
+                    }
+                }
+                else
+                {
+                    ReturnUrl = returnUrl;
+                    ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                    var companyLista = await _unitOfWork.Company.GetAllAsync();
+
+                    Input = new InputModel()
+                    {
+                        RoleList = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
+                        {
+                            Text = i,
+                            Value = i
+                        }),
+
+
+                        CompanyList = companyLista.Select(i => new SelectListItem
+                        {
+                            Text = i.CompanyName,
+                            Value = i.CompanyId.ToString()
+                        })
+                    };
+                }
+            }
+
+
+
+            
         }
 
-        public async Task<IActionResult> OnPostAsync(string returnUrl = null, IFormFile? file=null)
+        public async Task<IActionResult> OnPostAsync(string returnUrl = null, IFormFile? file = null)
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
@@ -183,7 +293,7 @@ namespace eCompany.Areas.Identity.Pages.Account
                     var uploads = Path.Combine(wwwRootPath, @"images\users");
                     var extension = Path.GetExtension(file.FileName);
 
-                    using (var fileStreams = new FileStream(Path.Combine(uploads, fileName+extension), FileMode.Create))
+                    using (var fileStreams = new FileStream(Path.Combine(uploads, fileName + extension), FileMode.Create))
                     {
                         file.CopyTo(fileStreams);
                     }
@@ -192,7 +302,7 @@ namespace eCompany.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    if(Input.Sex == 'M')
+                    if (Input.Sex == 'M')
                     {
                         user.ImageUrl = @"\images\users\maleUser.png";
                     }
@@ -218,7 +328,7 @@ namespace eCompany.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    if(Input.Role != null)
+                    if (Input.Role != null)
                     {
                         await _userManager.AddToRoleAsync(user, Input.Role);
                     }
@@ -248,12 +358,26 @@ namespace eCompany.Areas.Identity.Pages.Account
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
+
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
                     }
                     else
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
+                        // admin identification
+                        var claimsIdentity = (ClaimsIdentity)User.Identity;
+                        var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+
+                        if (claim == null)
+                        {
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                            return LocalRedirect(returnUrl);
+                        }
+                        else
+                        {
+                            return RedirectToAction("GetEmployees", "Manage", new { Area = "Admin", id = Input.CompanyId });
+                        } 
+                        
                     }
                 }
                 foreach (var error in result.Errors)

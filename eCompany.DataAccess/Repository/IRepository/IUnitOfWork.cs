@@ -11,6 +11,8 @@ namespace eCompany.DataAccess.Repository.IRepository
         ICompanyRepository Company{ get; }
         IApplicationUserRepository ApplicationUser{ get; }
 
+        ICompanyUsersRepository CompanyUsers{ get; }
+
         void Save();
     }
 }

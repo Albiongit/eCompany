@@ -1,19 +1,14 @@
-﻿@page
-@model IndexModel
-@{
-    ViewData["Title"] = "Profile";
-    ViewData["ActivePage"] = ManageNavPages.Index;
-    
-}
+﻿@using eCompany.Models.DTOs.Entities
+@model ApplicationUserDTO
 
-<h2>My Account</h2>
+
+<h2>Manage Account</h2>
 <hr />
-<div class="row">
+<div class="row justify-content-evenly">
     <div class="col-md-8">
         <form id="profile-form" method="post" enctype="multipart/form-data">
-            <input asp-for="Id" hidden/>
+            <input asp-for="@Model.Id" hidden/>
             <div class="row p-3 border">
-                <partial name="_StatusMessage" for="StatusMessage" />
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <h3>Profile</h3>
                 <div class="col-8 pt-4">
@@ -24,7 +19,7 @@
                     </div>
                     <br />
                     <div class="form-floating">
-                        <select asp-for="Sex" class="form-select">
+                        <select asp-for="Sex" class="form-select" required>
                             @if(Model.Sex == 'M')
                             {
                                 <option value="M">M</option>
@@ -41,24 +36,24 @@
                     </div>
                     <br />
                     <div class="form-floating">
-                        <input asp-for="Username" class="form-control" readonly />
-                        <label asp-for="Username" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" disabled/>
+                        <label asp-for="Email" class="form-label"></label>
                     </div>
                     <br />
                     <div class="form-floating">
-                        <input asp-for="PhoneNumber" class="form-control" />
+                        <input asp-for="PhoneNumber" class="form-control" required/>
                         <label asp-for="PhoneNumber" class="form-label"></label>
                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                     </div>
                     <br />
                     <div class="form-floating">
-                        <input asp-for="State" class="form-control" />
+                        <input asp-for="State" class="form-control" required/>
                         <label asp-for="State" class="form-label"></label>
                         <span asp-validation-for="State" class="text-danger"></span>
                     </div>
                     <br />
                     <div class="form-floating">
-                        <input asp-for="City" class="form-control" />
+                        <input asp-for="City" class="form-control" required/>
                         <label asp-for="City" class="form-label"></label>
                         <span asp-validation-for="City" class="text-danger"></span>
                     </div>
@@ -71,14 +66,16 @@
                     @if(Model.CompanyName != null)
                     {
                         <div class="form-floating">
-                        <input asp-for="CompanyName" class="form-control" readonly/>
+                        <input asp-for="CompanyName" class="form-control" disabled/>
                         <label asp-for="CompanyName" class="form-label"></label>
                         <span asp-validation-for="CompanyName" class="text-danger"></span>
                     </div>
                     <br />
                     }
                     <div class="form-floating">
-                        <input asp-for="Role" class="form-control" readonly/>
+                        <select asp-for="Role" asp-items="@Model.RoleList" class="form-select" required>
+                            <option>--Select new Role--</option>
+                        </select>
                         <label asp-for="Role" class="form-label"></label>
                     </div>
                     
@@ -91,8 +88,16 @@
             </div>
         </form>
     </div>
+    <div class="col-md-3 pl-sm-5">
+         <div class="row p-2 border">
+             <a asp-area="Admin" asp-controller="Manage" asp-action="GetEmployees" asp-route-id="@Model.CompanyId" type="button" class="btn btn-primary btn-lg btn-block">Back to list</a>
+    
+         </div>
+    </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+   
 }

@@ -1,0 +1,64 @@
+﻿@using eCompany.Models.DTOs.Entities
+@model CompanyDTO
+
+<h2>Manage Company - @Model.CompanyName</h2>
+<hr />
+
+<div class="row justify-content-between">
+    <div class="col-md-3">
+        <div class="row p-2 border">
+            <a href="#" id="companyBtn" data-id="@Model.CompanyId" class="btn btn-light btn-lg btn-block mb-2">Company</a>
+            <a asp-area="Admin" asp-controller="Manage" asp-action="GetEmployees" asp-route-id="@Model.CompanyId" id="employeeBtn" class="btn btn-light btn-lg btn-block mb-2">Employees</a>
+            <a asp-area="Admin" asp-controller="Company" asp-action="Index"  id="employeeBtn" class="btn btn-info btn-lg btn-block mb-2">Back</a>
+        </div>
+    </div>
+    <div id="partialViewUpdate" class="col-md-9" style="display:block">
+        @Html.Partial("_UpdatePartial")
+    </div>
+    @*<div id="partialViewEmployee" class="col-md-9" style="display:none">
+        @Html.Partial("_EmployeePartial");
+    </div>*@
+
+    
+</div>
+@section Scripts{
+<script type="text/javascript">
+    $(function () {
+        $('#companyBtn').click(function () {
+            var $buttonClicked = $(this);
+            var id = $buttonClicked.attr('data-id');
+
+            $.ajax({
+                url: '@Url.Action("GetUpdatePartial")',
+                type: 'GET',
+                data: { id: id },
+                success: function (partialView) {
+                    $('#partialViewEmployee').hide();
+                    $('#partialViewUpdate').html(partialView);
+                    $('#partialViewUpdate').show();
+                }
+            });
+        });
+    });
+
+    $(function () {
+        $('#employeeBtn').click(function () {
+            var $buttonClicked = $(this);
+            var id = $buttonClicked.attr('data-id');
+
+            $.ajax({
+                url: '@Url.Action("GetEmployeePartial")',
+                type: 'GET',
+                data: { id: id },
+                success: function (partialView) {
+                    $('#partialViewUpdate').hide();
+                    $('#partialViewEmployee').html(partialView);
+                    $('#partialViewEmployee').show();
+                }
+            });
+        });
+    });
+</script>
+
+<script src="~/js/manageEmployee.js"></script>
+}

@@ -1,13 +1,14 @@
-﻿@model Company
+﻿@using eCompany.Models.DTOs.Entities
+@model CompanyDTO
 
-<form method="post" asp-action="Upsert" enctype="multipart/form-data">
+<form method="post" asp-action="Insert" enctype="multipart/form-data">
 	<input asp-for="CompanyId" hidden />
 	
 	<div class="row">
 		<div class="col-10">
 			<div class="border p-3 mt-4 row">
 		<div class="col-12 pb-2">
-			<h2 class="text-primary">@(Model.CompanyId!=0?"Update": "Create")  Company</h2>
+			<h2 class="text-primary">Create New Company</h2>
 			<hr />
 		</div>
 		@*<div asp-validation-summary="All"></div>*@
@@ -33,14 +34,8 @@
 		</div>
 		
 		<div class="col-12">
-			@if (Model.CompanyId != 0)
-			{
-				<button type="submit" class="btn btn-primary" style="width:150px">Update</button>
-			}
-			else
-			{
-				<button type="submit" class="btn btn-primary" style="width:150px">Create</button>
-			}
+			
+			<button type="submit" class="btn btn-primary" style="width:150px">Create</button>
 			<a asp-controller="Company" asp-action="Index" class="btn btn-secondary" style="width:150px">
 				Back to List
 			</a>

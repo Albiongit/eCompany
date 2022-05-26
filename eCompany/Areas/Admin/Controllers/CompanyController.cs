@@ -16,32 +16,56 @@ namespace eCompany.Areas.Admin.Controllers
             _unitOfWork = unitOfWork;
         }
        
+
         public IActionResult Index()
         {
             return View();
         }
 
-        //GET
-        public IActionResult Upsert(int? id)
-        {
-            Company company = new();
+        
 
-            if(id == null || id == 0)
-            {
-                //create company
-                return View(company);
-            }
-            else
-            {
-                company = _unitOfWork.Company.GetFirstOrDefault(u => u.CompanyId == id);
-                return View(company);
-            }
+        //GET - Insert
+        public async Task<IActionResult> Insert()
+        {
+            CompanyDTO company = new();
+
+            //create company
+            return View(company);
+         
         }
 
-        //POST
+        //POST - Insert
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Upsert(CompanyDTO obj)
+        public async Task<IActionResult> Insert(CompanyDTO obj)
+        {
+            if (ModelState.IsValid)
+            {
+                var companyEntity = new Company
+                {
+                    CompanyName = obj.CompanyName,
+                    CompanyPhone = obj.CompanyPhone,
+                    CompanyState = obj.CompanyState,
+                    CompanyWeb = obj.CompanyWeb
+                };
+
+                    await _unitOfWork.Company.AddAsync(companyEntity);
+                    TempData["success"] = "Company created successfully!";
+                
+                _unitOfWork.Save();
+
+                return RedirectToAction("Index", "Company");
+            }
+            return View(obj);
+        }
+
+
+
+
+        //POST - Update
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(CompanyDTO obj)
         {
             if (ModelState.IsValid)
             {
@@ -53,20 +77,13 @@ namespace eCompany.Areas.Admin.Controllers
                     CompanyState = obj.CompanyState,
                     CompanyWeb = obj.CompanyWeb
                 };
-                if (obj.CompanyId == 0)
-                {
-                    
-                    _unitOfWork.Company.Add(companyEntity);
-                    TempData["success"] = "Company created successfully!";
-                }
-                else
-                {
-                    _unitOfWork.Company.Update(companyEntity);
-                    TempData["success"] = "Company updated successfully!";
-                }
+
+                _unitOfWork.Company.Update(companyEntity);
+                TempData["success"] = "Company updated successfully!";
+                
                 _unitOfWork.Save();
 
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Company");
             }
             return View(obj);
         }
@@ -74,23 +91,23 @@ namespace eCompany.Areas.Admin.Controllers
 
         #region API CALLS
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var companyList = _unitOfWork.Company.GetAll();
+            var companyList = await _unitOfWork.Company.GetAllAsync();
             return Json(new { data = companyList });
         }
 
         //POST
         [HttpDelete]
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
-            var obj = _unitOfWork.Company.GetFirstOrDefault(u => u.CompanyId == id);
+            var obj = await _unitOfWork.Company.GetFirstOrDefaultAsync(u => u.CompanyId == id);
             if(obj == null)
             {
                 return Json(new { success = false, message = "Error while deleting" });
             }
 
-            _unitOfWork.Company.Remove(obj);
+            await _unitOfWork.Company.RemoveAsync(obj);
             _unitOfWork.Save();
             return Json(new { success = true, message = "Delete Successful" });
         }

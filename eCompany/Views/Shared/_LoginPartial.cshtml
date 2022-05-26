@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using eCompany.Shared
 
 
 @inject SignInManager<IdentityUser> SignInManager
@@ -9,7 +10,6 @@
 @if (SignInManager.IsSignedIn(User))
 {
 
-    // TO DO
     @await Component.InvokeAsync("UserProfile")
     <li class="nav-item">
         <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
@@ -19,9 +19,13 @@
 }
 else
 {
-    <li class="nav-item">
-        <a class="nav-link text-light" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
+    @if(User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_SuperAdmin))
+    {
+        <li class="nav-item">
+            <a class="nav-link text-light" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        </li>
+    }
+    
     <li class="nav-item">
         <a class="nav-link text-light" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
     </li>

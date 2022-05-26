@@ -1,32 +1,39 @@
 ﻿var dataTable;
 
 $(document).ready(function () {
+
     loadDataTable();
+    
 });
 
+
 function loadDataTable() {
+    var id = $('#tblData').attr('data-id');
     dataTable = $('#tblData').DataTable({
         "ajax": {
-            "url":"/Admin/Company/GetAll"
+            "url": "/Admin/Manage/GetAll",
+            "data": {id : id}
         },
         "columns": [
-            {"data": "companyName", "width": "20%"},
-            {"data": "companyPhone", "width": "20%"},
-            {"data": "companyState", "width": "20%"},
-            {"data": "companyWeb", "width": "20%" },
+            {"data": "name", "width": "10%"},
+            {"data": "sex", "width": "10%"},
+            {"data": "email", "width": "20%"},
+            {"data": "phoneNumber", "width": "10%" },
+            {"data": "state", "width": "10%" },
+            {"data": "city", "width": "10%" },
             {
-                "data": "companyId",
+                "data": "id",
                 "render": function (data) {
                     return `
                         <div class="w-75 btn-group" role="group">
-                        <a href="/Admin/Manage/Index?id=${data}"
-                        class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i> Manage</a>
-                        <a onClick=Delete('/Admin/Company/Delete/${data}')
+                        <a href="/Admin/Manage/UpdateEmployee?id=${data}"
+                        class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i> Edit</a>
+                        <a onClick=Delete('/Admin/Manage/Delete?userId=${data}&id=${id}')
                         class="btn btn-danger mx-2"> <i class="bi bi-trash-fill"></i> Delete</a>
                         </div>
                             `
                 },
-                "width": "20%"
+                "width": "30%"
             }
         ]
     })
@@ -50,12 +57,14 @@ function Delete(url) {
                     if (data.success) {
                         dataTable.ajax.reload();
                         toastr.success(data.message);
+                        location.reload(true);
                     }
                     else {
                         toastr.error(data.message);
                     }
                 }
             })
+            location.reload(true);
         }
     })
 }

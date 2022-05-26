@@ -17,11 +17,13 @@ namespace eCompany.DataAccess.Repository
             _db = db;
             Company = new CompanyRepository(_db);
             ApplicationUser = new ApplicationUserRepository(_db);
+            CompanyUsers = new CompanyUsersRepository(_db);
         }
 
         public ICompanyRepository Company{ get; private set; }
 
         public IApplicationUserRepository ApplicationUser { get; private set; }
+        public ICompanyUsersRepository CompanyUsers { get; private set; }
 
         public void Save()
         {

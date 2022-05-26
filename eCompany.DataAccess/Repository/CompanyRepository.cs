@@ -21,7 +21,7 @@ namespace eCompany.DataAccess.Repository
         
         public void Update(Company company)
         {
-            _db.Update(company);
+             _db.Update(company);
         }
     }
 }

@@ -21,18 +21,18 @@ namespace eCompany.DataAccess.Repository
         }
 
 
-        public void Add(T entity)
+        public async Task AddAsync(T entity)
         {
             dbSet.Add(entity);
         }
 
-        public IEnumerable<T> GetAll()
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
             IQueryable<T> query = dbSet;
             return query.ToList();
         }
 
-        public T GetFirstOrDefault(System.Linq.Expressions.Expression<Func<T, bool>> filter)
+        public async Task<T> GetFirstOrDefaultAsync(System.Linq.Expressions.Expression<Func<T, bool>> filter)
         {
             IQueryable<T> query = dbSet;
 
@@ -41,12 +41,12 @@ namespace eCompany.DataAccess.Repository
             return query.FirstOrDefault();
         }
 
-        public void Remove(T entity)
+        public async Task RemoveAsync(T entity)
         {
             dbSet.Remove(entity);
         }
 
-        public void RemoveRange(IEnumerable<T> entities)
+        public async Task RemoveRangeAsync(IEnumerable<T> entities)
         {
             dbSet.RemoveRange(entities);
         }
