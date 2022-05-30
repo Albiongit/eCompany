@@ -13,6 +13,5 @@ namespace eCompany.Shared
         public const string Role_Employee = "Employee";
 
 
-        public const string test = "test";
     }
 }

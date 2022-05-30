@@ -20,13 +20,13 @@ namespace eCompany.DataAccess.Repository
             _db = db;
         }
 
-        public async Task<List<ApplicationUser>> GetAllUsers(int companyId)
+        public async Task<IQueryable<ApplicationUser>> GetAllUsers(int companyId)
         {
-            var userCompanies = await _db.Companies_Users
+            var userCompanies =  _db.Companies_Users
                 .Include(x => x.ApplicationUser)
                 .Where(x => x.CompanyId == companyId)
                 .Select(x => x.ApplicationUser)
-                .ToListAsync();
+                .AsQueryable();
 
             return userCompanies;
         }

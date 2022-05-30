@@ -7,13 +7,17 @@ $(document).ready(function () {
 function loadDataTable() {
     dataTable = $('#tblData').DataTable({
         "ajax": {
-            "url":"/Admin/Company/GetAll"
+            "url": "/Admin/Company/GetCompanyList",
+            "type": "POST"
         },
+        "proccesing": "true",
+        "serverSide": "true",
+        "filter": "true",
         "columns": [
-            {"data": "companyName", "width": "20%"},
-            {"data": "companyPhone", "width": "20%"},
-            {"data": "companyState", "width": "20%"},
-            {"data": "companyWeb", "width": "20%" },
+            {"data": "companyName", "name": "CompanyName", "width": "20%"},
+            {"data": "companyPhone", "name": "CompanyPhone", "width": "20%"},
+            {"data": "companyState", "name": "CompanyState", "width": "20%"},
+            {"data": "companyWeb", "name": "CompanyWeb", "width": "20%" },
             {
                 "data": "companyId",
                 "render": function (data) {

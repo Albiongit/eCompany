@@ -6,6 +6,7 @@ using eCompany.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Linq.Dynamic.Core;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace eCompany.Areas.Admin.Controllers
@@ -313,6 +314,54 @@ namespace eCompany.Areas.Admin.Controllers
 
             return Json(new { data = companyUsers });
         }
+
+
+        [HttpPost]
+        public async Task<JsonResult> GetEmployeeList(int? id)
+        {
+
+            var CompanyUsers = await _unitOfWork.CompanyUsers.GetFirstOrDefaultAsync(uc => uc.CompanyId == id);
+            var CompanyId = CompanyUsers.CompanyId;
+
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var draw = Request.Form["draw"].FirstOrDefault();
+            var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault();
+            var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+            var searchValue = Request.Form["search[value]"].FirstOrDefault();
+            int pageSize = Convert.ToInt32(Request.Form["length"].FirstOrDefault() ?? "0");
+            int skip = Convert.ToInt32(Request.Form["start"].FirstOrDefault() ?? "0");
+            var data = await _unitOfWork.CompanyUsers
+                .GetAllUsers(CompanyId);
+
+            totalRecord = data.Count();
+
+            if (!string.IsNullOrEmpty(searchValue))
+            {
+                data = data.Where(x => x.Name.ToLower().Contains(searchValue.ToLower()) || x.Email.ToLower().Contains(searchValue.ToLower()));
+            }
+
+            filterRecord = data.Count();
+
+            if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
+            {
+                data = data.OrderBy(sortColumn + " " + sortColumnDirection);
+            }
+
+
+            var empList = data.Skip(skip).Take(pageSize).ToList();
+
+            var returnObj = new
+            {
+                draw = draw,
+                recordsTotal = totalRecord,
+                recordsFiltered = filterRecord,
+                data = empList
+            };
+
+            return Json(returnObj);
+        }
+
 
 
         [HttpDelete]

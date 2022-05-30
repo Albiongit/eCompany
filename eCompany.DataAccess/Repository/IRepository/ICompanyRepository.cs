@@ -11,5 +11,7 @@ namespace eCompany.DataAccess.Repository.IRepository
     {
         void Update(Company company);
 
+        public Task<IQueryable<Company>> GetAllCompanies();
+
     }
 }

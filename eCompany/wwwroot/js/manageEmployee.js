@@ -11,16 +11,20 @@ function loadDataTable() {
     var id = $('#tblData').attr('data-id');
     dataTable = $('#tblData').DataTable({
         "ajax": {
-            "url": "/Admin/Manage/GetAll",
+            "url": "/Admin/Manage/GetEmployeeList",
+            "type": "POST",
             "data": {id : id}
         },
+        "proccesing": "true",
+        "serverSide": "true",
+        "filter": "true",
         "columns": [
-            {"data": "name", "width": "10%"},
-            {"data": "sex", "width": "10%"},
-            {"data": "email", "width": "20%"},
-            {"data": "phoneNumber", "width": "10%" },
-            {"data": "state", "width": "10%" },
-            {"data": "city", "width": "10%" },
+            { "data": "name", "name": "Name", "width": "10%" },
+            { "data": "sex", "name": "Sex", "width": "10%" },
+            { "data": "email", "name": "Email", "width": "20%" },
+            { "data": "phoneNumber", "name": "PhoneNumber", "width": "10%" },
+            { "data": "state", "name": "State", "width": "10%" },
+            { "data": "city", "name": "City", "width": "10%" },
             {
                 "data": "id",
                 "render": function (data) {

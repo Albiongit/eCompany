@@ -18,7 +18,13 @@ namespace eCompany.DataAccess.Repository
             _db = db;
         }
 
-        
+        public async Task<IQueryable<Company>> GetAllCompanies()
+        {
+            var companyList = _db.Companies.AsQueryable();
+
+            return companyList;
+        }
+
         public void Update(Company company)
         {
              _db.Update(company);

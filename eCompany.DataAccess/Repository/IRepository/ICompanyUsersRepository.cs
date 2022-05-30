@@ -10,7 +10,7 @@ namespace eCompany.DataAccess.Repository.IRepository
 {
     public interface ICompanyUsersRepository : IRepository<Company_User>
     {
-        public Task<List<ApplicationUser>> GetAllUsers(int companyId);
+        public Task<IQueryable<ApplicationUser>> GetAllUsers(int companyId);
 
         public Task<ApplicationUserDTO> GetUserProfile(string id);
 
