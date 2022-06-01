@@ -1,14 +1,26 @@
 ﻿var dataTable;
 
 $(document).ready(function () {
-    loadDataTable();
+    var url = window.location.search;
+    var role = "";
+    if (url.includes("employees")) {
+        role = "Employee"
+    } else if (url.includes("admins")) {
+        role = "Company Admin"
+    } else {
+        role = "";
+    }
+
+
+    loadDataTable(role);
 });
 
-function loadDataTable() {
+function loadDataTable(role) {
     dataTable = $('#tblData').DataTable({
         "ajax": {
             "url": "/Admin/Employee/GetEmployeeList",
-            "type": "POST"
+            "type": "POST",
+            "data": {status: role }
         },
         "proccesing": "true",
         "serverSide": "true",

@@ -1,19 +1,29 @@
 ﻿var dataTable;
 
 $(document).ready(function () {
+    var url = window.location.search;
+    var role = "";
+    if (url.includes("employees")) {
+        role = "Employee"
+    } else if (url.includes("admins")) {
+        role = "Company Admin"
+    } else {
+        role = "";
+    }
 
-    loadDataTable();
+
+    loadDataTable(role);
     
 });
 
 
-function loadDataTable() {
+function loadDataTable(role) {
     var id = $('#tblData').attr('data-id');
     dataTable = $('#tblData').DataTable({
         "ajax": {
             "url": "/Admin/Manage/GetEmployeeList",
             "type": "POST",
-            "data": {id : id}
+            "data": {id : id, status : role}
         },
         "proccesing": "true",
         "serverSide": "true",

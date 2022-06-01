@@ -81,6 +81,7 @@ namespace eCompany.Areas.Identity.Pages.Account
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         public string ReturnUrl { get; set; }
+        public int? ReturnId { get; set; }
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -149,8 +150,9 @@ namespace eCompany.Areas.Identity.Pages.Account
         }
 
 
-        public async Task OnGetAsync(string returnUrl = null)
+        public async Task OnGetAsync(string returnUrl = null, int? id = null)
         {
+            ReturnId = id;
             // admin identification
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
@@ -162,92 +164,90 @@ namespace eCompany.Areas.Identity.Pages.Account
                 _roleManager.CreateAsync(new IdentityRole(SD.Role_Employee)).GetAwaiter().GetResult();
             }
 
+            var companyAdmin = await _unitOfWork.CompanyUsers.GetFirstOrDefaultAsync(x => x.UserId == claim.Value);
+
             //Checking for company admin
-            if (claim?.Value == null)
+            if (companyAdmin == null)
             {
-
-                ReturnUrl = returnUrl;
-                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-                var companyLista = await _unitOfWork.Company.GetAllAsync();
-
-                Input = new InputModel()
+                if(ReturnId != null)
                 {
-                    RoleList = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
+                    ReturnUrl = returnUrl;
+                    ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                    var companyLista = await _unitOfWork.Company.GetAllAsync();
+
+                    Input = new InputModel()
                     {
-                        Text = i,
-                        Value = i
-                    }),
+                        RoleList = _roleManager.Roles.Where(r => r.Name != SD.Role_SuperAdmin).Select(x => x.Name).Select(i => new SelectListItem
+                        {
+                            Text = i,
+                            Value = i
+                        }),
 
 
-                    CompanyList = companyLista.Select(i => new SelectListItem
+                        CompanyList = companyLista.Where(x => x.CompanyId == ReturnId).Select(i => new SelectListItem
+                        {
+                            Text = i.CompanyName,
+                            Value = i.CompanyId.ToString()
+                        })
+
+                    };
+                } else {
+                    ReturnUrl = returnUrl;
+                    ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                    var companyLista = await _unitOfWork.Company.GetAllAsync();
+
+                    Input = new InputModel()
                     {
-                        Text = i.CompanyName,
-                        Value = i.CompanyId.ToString()
-                    })
-                };
+                        RoleList = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
+                        {
+                            Text = i,
+                            Value = i
+                        }),
 
+
+                        CompanyList = companyLista.Select(i => new SelectListItem
+                        {
+                            Text = i.CompanyName,
+                            Value = i.CompanyId.ToString()
+                        })
+
+                    };
+                }
+                
             }
             else
             {
 
-                var userCompany = await _unitOfWork.CompanyUsers.GetFirstOrDefaultAsync(uc => uc.UserId == claim.Value);
-
-
-                if (userCompany != null)
-                {
                     //Company Admin
 
                     var useri = new IdentityUser
                     {
-                        Id = userCompany.UserId
+                        Id = companyAdmin.UserId
                     };
 
                     var companyAdminStatus = await _userManager.IsInRoleAsync(useri, SD.Role_Admin);
 
-                    if (companyAdminStatus)
+                if (companyAdminStatus)
+                {
+                    ReturnUrl = returnUrl;
+                    ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                    var companyLista = await _unitOfWork.Company.GetAllAsync();
+
+                    Input = new InputModel()
                     {
-                        ReturnUrl = returnUrl;
-                        ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-                        var companyLista = await _unitOfWork.Company.GetAllAsync();
-
-                        Input = new InputModel()
+                        RoleList = _roleManager.Roles.Where(r => r.Name != SD.Role_SuperAdmin).Select(x => x.Name).Select(i => new SelectListItem
                         {
-                            RoleList = _roleManager.Roles.Where(r => r.Name != SD.Role_SuperAdmin).Select(x => x.Name).Select(i => new SelectListItem
-                            {
-                                Text = i,
-                                Value = i
-                            }),
+                            Text = i,
+                            Value = i
+                        }),
 
 
-                            CompanyList = companyLista.Where(x => x.CompanyId == userCompany.CompanyId).Select(i => new SelectListItem
-                            {
-                                Text = i.CompanyName,
-                                Value = i.CompanyId.ToString()
-                            })
-                        };
-                    }
-                    else
-                    {
-                        ReturnUrl = returnUrl;
-                        ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-                        var companyLista = await _unitOfWork.Company.GetAllAsync();
-
-                        Input = new InputModel()
+                        CompanyList = companyLista.Where(x => x.CompanyId == companyAdmin.CompanyId).Select(i => new SelectListItem
                         {
-                            RoleList = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
-                            {
-                                Text = i,
-                                Value = i
-                            }),
-
-
-                            CompanyList = companyLista.Select(i => new SelectListItem
-                            {
-                                Text = i.CompanyName,
-                                Value = i.CompanyId.ToString()
-                            })
-                        };
-                    }
+                            Text = i.CompanyName,
+                            Value = i.CompanyId.ToString()
+                        })
+                    };
                 }
                 else
                 {
@@ -271,6 +271,7 @@ namespace eCompany.Areas.Identity.Pages.Account
                         })
                     };
                 }
+
             }
 
 

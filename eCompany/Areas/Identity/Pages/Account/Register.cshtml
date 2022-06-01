@@ -8,9 +8,10 @@
 
 <div class="row pt-4">
     <div class="col-md-7">
-        <form id="registerForm" class="row" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data">
+        <form id="registerForm" class="row" asp-route-returnUrl="@Model.ReturnUrl" asp-route-returnId="@Model.ReturnId" method="post" enctype="multipart/form-data">
             <h2>Create a new account.</h2>
             <hr />
+            <div id="CompanyId" hidden>@Model.ReturnId</div>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-floating py-1 col-12">
                 <input asp-for="Input.Email" class="form-control" aria-required="true" />
@@ -73,6 +74,12 @@
                 </select>
                 <label asp-for="Input.CompanyId" style="margin-left:5px;" ></label>
             </div>
+            <div class="form-floating py-1 col-6" id="Input_CompanyId2" style="display:none">
+                <select asp-for="Input.CompanyId" asp-items="@Model.Input.CompanyList" class="form-select" required>
+                    
+                </select>
+                <label asp-for="Input.CompanyId" style="margin-left:5px;" ></label>
+            </div>
             <button id="registerSubmit" type="submit" class="w-100 btn btn-primary">Register</button>
         </form>
     </div>
@@ -82,7 +89,9 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function() {
-            $('#Input_Role').change(function() {
+            var company = $('#CompanyId').text();
+            if(company == ""){
+                 $('#Input_Role').change(function() {
                 var selection = $('#Input_Role Option:Selected').text();
                 if(selection == "Company Admin"){
                     $('#Input_CompanyId').show();
@@ -95,6 +104,11 @@
                     }
                 }
             })
+            }
+            else {
+                $('#Input_CompanyId2').show();
+            }
+           
         })
     </script>
 }

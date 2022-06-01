@@ -109,7 +109,7 @@ namespace eCompany.Areas.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
-                return RedirectToAction("Update", applicationUser.Id);
+                return RedirectToAction("Update", new { id = applicationUser.Id });
             }
 
 
@@ -241,7 +241,7 @@ namespace eCompany.Areas.Admin.Controllers
             var CompanyId = CompanyUsers.CompanyId;
 
             var companyUsers = await _unitOfWork.CompanyUsers
-                .GetAllUsers(CompanyId);
+                .GetAllUsers(CompanyId, "employee");
 
             return Json( new { data = companyUsers });
         }
@@ -249,7 +249,7 @@ namespace eCompany.Areas.Admin.Controllers
 
 
         [HttpPost]
-        public async Task<JsonResult> GetEmployeeList()
+        public async Task<JsonResult> GetEmployeeList(string? status)
         {
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
@@ -266,7 +266,7 @@ namespace eCompany.Areas.Admin.Controllers
             int pageSize = Convert.ToInt32(Request.Form["length"].FirstOrDefault() ?? "0");
             int skip = Convert.ToInt32(Request.Form["start"].FirstOrDefault() ?? "0");
             var data = await _unitOfWork.CompanyUsers
-                .GetAllUsers(CompanyId);
+                .GetAllUsers(CompanyId, status);
 
             totalRecord = data.Count();
 
@@ -284,6 +284,7 @@ namespace eCompany.Areas.Admin.Controllers
 
 
             var empList = data.Skip(skip).Take(pageSize).ToList();
+
 
             var returnObj = new
             {

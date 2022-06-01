@@ -1,18 +1,54 @@
 ﻿@using eCompany.Models.DTOs.Entities
+@{
+	var status = Context.Request.Query["status"];
 
+	var employees = "text primary";
+	var all = "text primary";
+	var admins = "text primary";
+
+	switch (status)
+	{
+		case "employees" :
+			employees = "active text-white";
+			break;
+		case "admins" :
+			admins = "active text-white";
+			break;
+		default :
+			all = "active text-white";
+			break;
+
+	}
+}
 @model CompanyDTO
 <div class="container p-3">
 	<div class="row pt-4">
 		<div class="col-6">
 			<h2 class="text-primary">@Model.CompanyName - Employee List</h2>
 		</div>
-		<div class="col-6 text-end">
-			<a id="register" asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary">
-				<i class="bi bi-plus-circle"></i> &nbsp; Add New Employee
-			</a>
-		</div>
+		
 	</div>
-	<br /><br />
+	<div class="row pt-4">
+		<div class="col-6 ">
+			<ul class="list-group list-group-horizontal-sm">
+                <a class="p-1" style="text-decoration:none" asp-controller="Manage" asp-action="GetEmployees" asp-route-id="@Model.CompanyId" asp-route-status="all">
+                    <li class="list-group-item @all" >All</li>
+                </a>
+                <a class="p-1" style="text-decoration:none" asp-controller="Manage" asp-action="GetEmployees" asp-route-id="@Model.CompanyId" asp-route-status="admins">
+                    <li class="list-group-item @admins" >Admins</li>
+                </a>
+                <a class="p-1" style="text-decoration:none" asp-controller="Manage" asp-action="GetEmployees" asp-route-id="@Model.CompanyId" asp-route-status="employees">
+                    <li class="list-group-item @employees" >Employees</li>
+                </a>
+            </ul>
+		</div>
+		<div class="col-6 text-end">
+				<a id="register" asp-area="Identity" asp-page="/Account/Register" asp-route-id="@Model.CompanyId" class="btn btn-primary">
+					<i class="bi bi-plus-circle"></i> &nbsp; Add New Employee
+				</a>
+        </div>
+	</div>
+	<br />
 
 	<table id="tblData" data-id="@Model.CompanyId" class="table table-bordered table-striped" style="width:100%">
 		<thead>
@@ -23,7 +59,7 @@
 				<th>Phone Number</th>
 				<th>State</th>
 				<th>City</th>
-				<th></th>
+				<th>Update</th>
 			</tr>
 		</thead>
 	</table>

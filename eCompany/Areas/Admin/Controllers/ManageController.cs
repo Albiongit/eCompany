@@ -74,7 +74,7 @@ namespace eCompany.Areas.Admin.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetEmployees(int? id)
+        public async Task<IActionResult> GetEmployees(int? id, string? status)
         {
             var company = await _unitOfWork.Company.GetFirstOrDefaultAsync(uc => uc.CompanyId == id);
             CompanyDTO companyDTO = new CompanyDTO
@@ -167,7 +167,7 @@ namespace eCompany.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateEmployee(ApplicationUserDTO applicationUser, IFormFile? file = null)
         {
-            String StatusMessage = "Nothing in the profile has changed";
+            var StatusMessage = "Nothing in the profile has changed";
 
             var userFromDb = _db.ApplicationUsers.FirstOrDefault(u => u.Id == applicationUser.Id);
             if (userFromDb == null)
@@ -175,9 +175,9 @@ namespace eCompany.Areas.Admin.Controllers
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
             {
-                return RedirectToAction("UpdateEmployee", applicationUser.Id);
+                return RedirectToAction("UpdateEmployee", new { id = applicationUser.Id });
             }
 
 
@@ -310,18 +310,18 @@ namespace eCompany.Areas.Admin.Controllers
             var CompanyId = CompanyUsers.CompanyId;
 
             var companyUsers = await _unitOfWork.CompanyUsers
-                .GetAllUsers(CompanyId);
+                .GetAllUsers(CompanyId, "employee");
 
             return Json(new { data = companyUsers });
         }
 
 
         [HttpPost]
-        public async Task<JsonResult> GetEmployeeList(int? id)
+        public async Task<JsonResult> GetEmployeeList(int id, string? status)
         {
-
-            var CompanyUsers = await _unitOfWork.CompanyUsers.GetFirstOrDefaultAsync(uc => uc.CompanyId == id);
-            var CompanyId = CompanyUsers.CompanyId;
+            
+            //var CompanyUsers = await _unitOfWork.CompanyUsers.GetFirstOrDefaultAsync(uc => uc.CompanyId == id);
+            //var CompanyId = CompanyUsers.CompanyId;
 
             int totalRecord = 0;
             int filterRecord = 0;
@@ -331,8 +331,19 @@ namespace eCompany.Areas.Admin.Controllers
             var searchValue = Request.Form["search[value]"].FirstOrDefault();
             int pageSize = Convert.ToInt32(Request.Form["length"].FirstOrDefault() ?? "0");
             int skip = Convert.ToInt32(Request.Form["start"].FirstOrDefault() ?? "0");
+
             var data = await _unitOfWork.CompanyUsers
-                .GetAllUsers(CompanyId);
+                .GetAllUsers(id, status);
+
+            if (status == "employees")
+            {
+                 data = await _unitOfWork.CompanyUsers
+                    .GetAllUsers(id, "Employee");
+            } else if(status == "admins")
+            {
+                 data = await _unitOfWork.CompanyUsers
+                    .GetAllUsers(id, "Company Admin");
+            }
 
             totalRecord = data.Count();
 

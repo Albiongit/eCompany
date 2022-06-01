@@ -25,7 +25,7 @@ namespace eCompany.Models.DTOs.Entities
         public string? ImageUrl { get; set; }
         [Required]
         public char Sex { get; set; }
-        [Required]
+        
         public string? Role { get; set; }
         
         public string? CompanyName { get; set; }
