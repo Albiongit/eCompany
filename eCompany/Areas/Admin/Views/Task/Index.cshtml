@@ -1,0 +1,92 @@
+﻿@using eCompany.Models.DTOs.Entities
+@model CompanyDTO
+@{
+    var status = Context.Request.Query["status"];
+
+    var All = "text-primary";
+    var New = "text primary";
+	var Active = "text primary";
+	var Problem = "text primary";
+	var Done = "text primary";
+	var Rejected = "text primary";
+
+	switch (status)
+	{
+		case "New" :
+			New = "active text-white";
+			break;
+		case "Active" :
+			Active = "active text-white";
+			break;
+        case "Problem" :
+			Problem = "active text-white";
+			break;
+        case "Done" :
+			Done = "active text-white";
+			break;
+        case "Rejected" :
+			Rejected = "active text-white";
+			break;
+		default :
+			All = "active text-white";
+			break;
+
+	}
+}
+
+<h2>Manage Tasks - @Model.CompanyName Company</h2>
+<hr />
+<div class="row justify-content-between">
+    <div class="col-md-3">
+        <div class="row p-2 border">
+            <a href="#" id="companyBtn" type="button"  class="btn btn-secondary btn-lg btn-block mb-2">Tasks</a>
+            <a asp-area="Admin" asp-controller="Task" asp-action="CreateTask" asp-route-companyId="@Model.CompanyId" id="employeeBtn" class="btn btn-light btn-lg btn-block mb-2">Create New Task</a>
+            <a asp-area="Customer" asp-controller="Home" asp-action="Index"  id="employeeBtn" class="btn btn-info btn-lg btn-block mb-2">Back To Home</a>
+        </div>
+    </div>
+    <div class="col-md-9 border" style="display:block">
+        <h3 style="text-align:center;">Tasks</h3>
+        <div class="row p-2">
+            <ul class="list-group list-group-horizontal-sm">
+                <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Index" asp-route-id="@Model.CompanyId" >
+                    <li class="list-group-item @All" >All</li>
+                </a>
+                <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Index" asp-route-id="@Model.CompanyId" asp-route-status="New">
+                    <li class="list-group-item @New" >New</li>
+                </a>
+                <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Index" asp-route-id="@Model.CompanyId" asp-route-status="Active">
+                    <li class="list-group-item @Active" >Active</li>
+                </a>
+                <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Index" asp-route-id="@Model.CompanyId" asp-route-status="Problem">
+                    <li class="list-group-item @Problem" >Problem</li>
+                </a>
+                <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Index" asp-route-id="@Model.CompanyId" asp-route-status="Done">
+                    <li class="list-group-item @Done" >Done</li>
+                </a>
+                <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Index" asp-route-id="@Model.CompanyId" asp-route-status="Rejected">
+                    <li class="list-group-item @Rejected" >Rejected</li>
+                </a>
+            </ul>
+            <hr />
+        </div>
+        <div class="row pt-4">
+            <table id="tblData" data-id="@Model.CompanyId" class="table table-bordered table-striped" style="width:100%">
+		    <thead>
+			    <tr>
+				    <th>Task ID</th>
+				    <th>Title</th>
+                    <th>Employee</th>
+				    <th>Status</th>
+				    <th>Details</th>
+			    </tr>
+		    </thead>
+	        </table>
+        </div>
+    </div>
+
+    
+</div>
+
+@section Scripts{
+    <script src="~/js/task.js"></script>
+}

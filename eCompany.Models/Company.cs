@@ -21,6 +21,8 @@ namespace eCompany.Models
 
         public string? CompanyWeb { get; set; }
 
+        public ICollection<TaskEntity> Tasks { get; set; }
+
 
 
         // Navigations Properties

@@ -29,6 +29,7 @@ using Microsoft.Extensions.Logging;
 
 namespace eCompany.Areas.Identity.Pages.Account
 {
+    [Authorize(Roles = SD.Role_SuperAdmin + "," + SD.Role_Admin)]
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<IdentityUser> _signInManager;
@@ -89,6 +90,9 @@ namespace eCompany.Areas.Identity.Pages.Account
         /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
+
+        public string ErrorText { get; set; }
+
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
@@ -147,12 +151,14 @@ namespace eCompany.Areas.Identity.Pages.Account
 
             [ValidateNever]
             public IEnumerable<SelectListItem> CompanyList { get; set; }
+
         }
 
 
-        public async Task OnGetAsync(string returnUrl = null, int? id = null)
+        public async Task OnGetAsync(string returnUrl = null, int? id = null, string? errorText = null)
         {
             ReturnId = id;
+            ErrorText = errorText;
             // admin identification
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
@@ -251,25 +257,26 @@ namespace eCompany.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ReturnUrl = returnUrl;
-                    ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-                    var companyLista = await _unitOfWork.Company.GetAllAsync();
+                    //ReturnUrl = returnUrl;
+                    //ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                    //var companyLista = await _unitOfWork.Company.GetAllAsync();
 
-                    Input = new InputModel()
-                    {
-                        RoleList = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
-                        {
-                            Text = i,
-                            Value = i
-                        }),
+                    //Input = new InputModel()
+                    //{
+                    //    RoleList = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
+                    //    {
+                    //        Text = i,
+                    //        Value = i
+                    //    }),
 
 
-                        CompanyList = companyLista.Select(i => new SelectListItem
-                        {
-                            Text = i.CompanyName,
-                            Value = i.CompanyId.ToString()
-                        })
-                    };
+                    //    CompanyList = companyLista.Select(i => new SelectListItem
+                    //    {
+                    //        Text = i.CompanyName,
+                    //        Value = i.CompanyId.ToString()
+                    //    })
+                    //};
+                    RedirectToAction("Index", new { Area = "Customer" });
                 }
 
             }
@@ -283,6 +290,7 @@ namespace eCompany.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
@@ -367,28 +375,34 @@ namespace eCompany.Areas.Identity.Pages.Account
                         // admin identification
                         var claimsIdentity = (ClaimsIdentity)User.Identity;
                         var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-
+                        var adminStatus = await _unitOfWork.CompanyUsers.GetFirstOrDefaultAsync(u => u.UserId == claim.Value);
 
                         if (claim == null)
                         {
                             await _signInManager.SignInAsync(user, isPersistent: false);
                             return LocalRedirect(returnUrl);
                         }
-                        else
+                        else if (adminStatus != null)
                         {
+                            ErrorText = "";
+                            return RedirectToAction("GetAll", "Employe", new { Area = "Admin"});
+                        } else
+                        {
+                            ErrorText = "";
                             return RedirectToAction("GetEmployees", "Manage", new { Area = "Admin", id = Input.CompanyId });
-                        } 
+                        }
                         
                     }
                 }
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
+                    ErrorText = error.Description;
                 }
             }
 
             // If we got this far, something failed, redisplay form
-            return Page();
+            return RedirectToPage("Register", new { errorText = ErrorText });
         }
 
         private ApplicationUser CreateUser()

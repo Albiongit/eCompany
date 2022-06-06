@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskEntity = eCompany.Models.TaskEntity;
 
 namespace eCompany.DataAccess.Data
 {
@@ -27,6 +28,19 @@ namespace eCompany.DataAccess.Data
                 .WithMany(cu => cu.Company_Users)
                 .HasForeignKey(ui => ui.UserId);
 
+            modelBuilder.Entity<TaskEntity>()
+                .HasOne(x => x.Employee)
+                .WithMany(e => e.Tasks)
+                .HasForeignKey(x => x.EmployeeId)
+                .IsRequired();
+            
+            modelBuilder.Entity<TaskEntity>()
+                .HasOne(x => x.Company)
+                .WithMany(e => e.Tasks)
+                .HasForeignKey(x => x.CompanyID)
+                .IsRequired();
+
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -35,6 +49,7 @@ namespace eCompany.DataAccess.Data
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<Company_User> Companies_Users { get; set; }
+        public DbSet<TaskEntity> Tasks { get; set; }
 
         
     }

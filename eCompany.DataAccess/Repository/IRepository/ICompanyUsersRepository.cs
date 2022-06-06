@@ -13,6 +13,8 @@ namespace eCompany.DataAccess.Repository.IRepository
         public Task<IQueryable<ApplicationUserDTO>> GetAllUsers(int companyId, string? role);
 
         public Task<ApplicationUserDTO> GetUserProfile(string id);
+        public Task<CompanyDTO> GetCompanyDetails(string id);
+        
 
     }
 }

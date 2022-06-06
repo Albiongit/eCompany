@@ -25,12 +25,14 @@ namespace eCompany.DataAccess.Repository
             Company = new CompanyRepository(_db);
             ApplicationUser = new ApplicationUserRepository(_db);
             CompanyUsers = new CompanyUsersRepository(_db, _roleManager, _userManager);
+            Tasks = new TaskRepository(_db);
         }
 
         public ICompanyRepository Company{ get; private set; }
 
         public IApplicationUserRepository ApplicationUser { get; private set; }
         public ICompanyUsersRepository CompanyUsers { get; private set; }
+        public ITaskRepository Tasks { get; private set; }
 
         public void Save()
         {

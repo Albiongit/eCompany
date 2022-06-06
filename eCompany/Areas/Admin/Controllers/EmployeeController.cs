@@ -11,10 +11,12 @@ using System.Security.Claims;
 using System.Linq.Dynamic.Core;
 using static eCompany.Areas.Identity.Pages.Account.LoginModel;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace eCompany.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin + "," + SD.Role_SuperAdmin)]
     public class EmployeeController : Controller
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -42,9 +44,7 @@ namespace eCompany.Areas.Admin.Controllers
              var claimsIdentity = (ClaimsIdentity)User.Identity;
              var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
 
-             var CompanyUsers = await _unitOfWork.CompanyUsers.GetFirstOrDefaultAsync(uc => uc.UserId == claim.Value);
-
-             var companyDetails = await _unitOfWork.Company.GetFirstOrDefaultAsync(c => c.CompanyId == CompanyUsers.CompanyId);
+            var companyDetails = await _unitOfWork.CompanyUsers.GetCompanyDetails(claim.Value);
 
              return View(companyDetails);
         }

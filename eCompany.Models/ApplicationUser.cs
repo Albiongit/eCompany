@@ -27,6 +27,8 @@ namespace eCompany.Models
         [Required]
         public string Role { get; set; }
 
+        public ICollection<TaskEntity> Tasks { get; set; }
+
 
 
 

@@ -12,6 +12,8 @@ namespace eCompany.DataAccess.Repository.IRepository
         IApplicationUserRepository ApplicationUser{ get; }
 
         ICompanyUsersRepository CompanyUsers{ get; }
+        ITaskRepository Tasks{ get; }
+
 
         void Save();
     }

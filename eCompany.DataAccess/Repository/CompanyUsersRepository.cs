@@ -83,6 +83,25 @@ namespace eCompany.DataAccess.Repository
 
         }
 
+        public async Task<CompanyDTO> GetCompanyDetails(string id)
+        {
+            var companyDetails = await _db.Companies_Users
+                    .Include(x => x.Company)
+                    .Where(x => x.UserId == id)
+                    .Select(x => new CompanyDTO
+                    {
+                        CompanyId = x.Company.CompanyId,
+                        CompanyName = x.Company.CompanyName,
+                        CompanyPhone = x.Company.CompanyPhone,
+                        CompanyState = x.Company.CompanyState,
+                        CompanyWeb = x.Company.CompanyWeb
+                    }).FirstOrDefaultAsync();
+
+            return companyDetails;
+        }
+
+
+
         public async Task<ApplicationUserDTO> GetUserProfile(string userId)
         {
             var userFromDb = await _db.Companies_Users

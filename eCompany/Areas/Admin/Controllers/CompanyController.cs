@@ -1,13 +1,15 @@
 ﻿using eCompany.DataAccess.Repository.IRepository;
 using eCompany.Models;
 using eCompany.Models.DTOs.Entities;
+using eCompany.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Dynamic.Core;
 
 namespace eCompany.Areas.Admin.Controllers
 {
     [Area("Admin")]
-
+    [Authorize( Roles = SD.Role_Admin + "," + SD.Role_SuperAdmin)]
     public class CompanyController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -18,14 +20,16 @@ namespace eCompany.Areas.Admin.Controllers
         }
        
 
+        [Authorize(Roles = SD.Role_SuperAdmin)]
         public IActionResult Index()
         {
             return View();
         }
 
-        
+
 
         //GET - Insert
+        [Authorize(Roles = SD.Role_SuperAdmin)]
         public async Task<IActionResult> Insert()
         {
             CompanyDTO company = new();
@@ -38,6 +42,7 @@ namespace eCompany.Areas.Admin.Controllers
         //POST - Insert
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = SD.Role_SuperAdmin)]
         public async Task<IActionResult> Insert(CompanyDTO obj)
         {
             if (ModelState.IsValid)
@@ -101,6 +106,7 @@ namespace eCompany.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = SD.Role_SuperAdmin)]
         public async Task<JsonResult> GetCompanyList()
         {
 
@@ -144,6 +150,7 @@ namespace eCompany.Areas.Admin.Controllers
 
         //POST
         [HttpDelete]
+        [Authorize(Roles = SD.Role_SuperAdmin)]
         public async Task<IActionResult> Delete(int? id)
         {
             var obj = await _unitOfWork.Company.GetFirstOrDefaultAsync(u => u.CompanyId == id);

@@ -1,0 +1,71 @@
+﻿@using eCompany.Models.DTOs.Entities
+@model TaskEntityDTO
+
+
+<h1 style="text-align:center" class="p-3">@Model.CompanyName Company</h1>
+
+<div class="row p-2 border m-auto col-8"  >
+    <div class="col-md-12">
+        <form id="registerForm" class="row" method="post" enctype="multipart/form-data">
+            <h3 style="text-align:center">Create a new Task</h3>
+            <hr />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-floating py-2 col-12">
+                <input asp-for="Title" class="form-control" aria-required="true" />
+                <label asp-for="Title" style="margin-left:5px;"></label>
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-floating py-2 col-6">
+                <select asp-for="EmployeeId" asp-items="@Model.EmployeeList" class="form-select" required>
+                    <option disabled selected>-Select Employee-</option>
+                </select>
+                <label asp-for="EmployeeName" style="margin-left:5px;"></label>
+                <span asp-validation-for="EmployeeId" class="text-danger"></span>
+            </div>
+            <div class="form-floating py-2 col-6">
+                <input asp-for="DayDuration" type="number" min="1" class="form-control" aria-required="true" />
+                <label asp-for="DayDuration" style="margin-left:5px;"></label>
+                <span asp-validation-for="DayDuration" class="text-danger"></span>
+            </div>
+            <div class="form-floating py-2 col-6">
+                <input asp-for="AssignedDate" type="date" class="form-control" aria-required="true" />
+                <label asp-for="AssignedDate" style="margin-left:5px;"></label>
+                <span asp-validation-for="AssignedDate" class="text-danger"></span>
+            </div>
+            <div class="form-floating py-2 col-6">
+                <input asp-for="CompanyName" readonly class="form-control" />
+                <label asp-for="CompanyName" style="margin-left:5px;"></label>
+            </div>
+            <div class="form-floating py-2 col-12">
+                <textarea asp-for="Description" class="form-control" aria-required="true"></textarea>
+                <label asp-for="Description" style="margin-left:5px;"></label>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+           @*
+            <div class="form-floating py-2 col-6">
+                <select asp-for="Input.Role" id="Input_Role" asp-items="@Model.Input.RoleList" class="form-select" required>
+                    <option disabled selected>-Select Role-</option>
+                </select>
+                <label asp-for="Input.Role" style="margin-left:5px;"></label>
+                <span asp-validation-for="Input.Role" class="text-danger"></span>
+            </div>
+            <div class="form-floating py-2 col-6" id="Input_CompanyId" style="display:none">
+                <select asp-for="Input.CompanyId" asp-items="@Model.Input.CompanyList" class="form-select" required>
+                    <option disabled selected>-Select Company-</option>
+                </select>
+                <label asp-for="Input.CompanyId" style="margin-left:5px;" ></label>
+            </div>*@
+            <br />
+            <div class="form-floating py-2 col-12" style="text-align:center">
+                <a asp-area="Admin" asp-controller="Task" asp-action="Index" type="button" class="btn btn-primary btn-lg btn-block m-2">Discard Task</a>
+                <button id="registerSubmit" type="submit" class="w-90 btn btn-success btn-lg btn-block m-2">Assign Task</button>
+            </div>
+	        </form>
+    </div>
+</div>
+
+@section Scripts{
+    @{
+	<partial name="_ValidationScriptsPartial" />
+	}
+}
