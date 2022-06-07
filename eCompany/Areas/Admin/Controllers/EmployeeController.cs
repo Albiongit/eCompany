@@ -50,6 +50,7 @@ namespace eCompany.Areas.Admin.Controllers
         }
 
         //GET
+        [HttpGet]
         public async Task<IActionResult> Update(string id)
         {   
 

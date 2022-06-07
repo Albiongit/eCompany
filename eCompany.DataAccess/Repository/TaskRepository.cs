@@ -2,6 +2,7 @@
 using eCompany.DataAccess.Repository.IRepository;
 using eCompany.Models;
 using eCompany.Models.DTOs.Entities;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,11 +24,69 @@ namespace eCompany.DataAccess.Repository
         public async Task<IQueryable<TaskEntityDTO>> GetAllTasks(int id, Status? status)
         {
 
+            if(status == null)
+            {
+                var taskDetails = (from t in _db.Tasks
+                                   join c in _db.Companies on t.CompanyID equals c.CompanyId
+                                   join aU in _db.ApplicationUsers on t.EmployeeId equals aU.Id
+                                   where c.CompanyId == id
+                                   select new TaskEntityDTO
+                                   {
+                                       CompanyId = c.CompanyId,
+                                       CompanyName = c.CompanyName,
+                                       CompanyPhone = c.CompanyPhone,
+                                       CompanyState = c.CompanyState,
+                                       CompanyWeb = c.CompanyWeb,
+                                       TaskId = t.TaskId,
+                                       Title = t.Title,
+                                       EmployeeId = t.EmployeeId,
+                                       DayDuration = t.DayDuration,
+                                       Description = t.Description,
+                                       AssignedDate = t.AssignedDate,
+                                       FinishedDate = t.FinishedDate,
+                                       EmployeeName = aU.Name,
+                                       Status = t.Status
+                                   }).AsQueryable();
+
+                return taskDetails;
+
+            }else
+            {
+                var taskDetails = (from t in _db.Tasks
+                                   join c in _db.Companies on t.CompanyID equals c.CompanyId
+                                   join aU in _db.ApplicationUsers on t.EmployeeId equals aU.Id
+                                   where c.CompanyId == id
+                                   where t.Status == status
+                                   select new TaskEntityDTO
+                                   {
+                                       CompanyId = c.CompanyId,
+                                       CompanyName = c.CompanyName,
+                                       CompanyPhone = c.CompanyPhone,
+                                       CompanyState = c.CompanyState,
+                                       CompanyWeb = c.CompanyWeb,
+                                       TaskId = t.TaskId,
+                                       Title = t.Title,
+                                       EmployeeId = t.EmployeeId,
+                                       DayDuration = t.DayDuration,
+                                       Description = t.Description,
+                                       AssignedDate = t.AssignedDate,
+                                       FinishedDate = t.FinishedDate,
+                                       EmployeeName = aU.Name,
+                                       Status = t.Status
+                                   }).AsQueryable();
+
+                return taskDetails;
+            }
+
+            
+        }
+
+        public async Task<TaskEntityDTO> GetTaskDetails(int taskId)
+        {
             var taskDetails = (from t in _db.Tasks
                                join c in _db.Companies on t.CompanyID equals c.CompanyId
                                join aU in _db.ApplicationUsers on t.EmployeeId equals aU.Id
-                               where c.CompanyId == id
-                               where t.Status == status
+                               where t.TaskId == taskId
                                select new TaskEntityDTO
                                {
                                    CompanyId = c.CompanyId,
@@ -42,9 +101,10 @@ namespace eCompany.DataAccess.Repository
                                    Description = t.Description,
                                    AssignedDate = t.AssignedDate,
                                    FinishedDate = t.FinishedDate,
+                                   DueDate = t.AssignedDate.AddDays(t.DayDuration),
                                    EmployeeName = aU.Name,
                                    Status = t.Status
-                               }).AsQueryable();
+                               }).FirstOrDefault();
 
             return taskDetails;
         }

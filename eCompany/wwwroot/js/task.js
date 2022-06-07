@@ -35,18 +35,18 @@ function loadDataTable(status) {
         "serverSide": "true",
         "filter": "true",
         "columns": [
-            { "data": "taskId", "name": "TaskId", "width": "15%" },
-            { "data": "title", "name": "Title", "width": "20%" },
-            { "data": "employee", "name": "Employee", "width": "20%" },
+            { "data": "taskId", "name": "TaskId", "width": "10%" },
+            { "data": "title", "name": "Title", "width": "25%" },
+            { "data": "employeeName", "name": "EmployeeName", "width": "25%" },
             { "data": "status", "name": "Status", "width": "15%" },
             {
-                "data": "id",
+                "data": "taskId",
                 "render": function (data) {
                     return `
                         <div class="w-75 btn-group" role="group">
-                        <a href="/Admin/Task/Update?id=${data}"
+                        <a href="/Admin/Task/Details?taskId=${data}"
                         class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i> Details</a>
-                        <a onClick=Delete('/Admin/Task/Delete?userId=${data}&id=${id}')
+                        <a onClick=Delete('/Admin/Task/Delete?taskId=${data}')
                         class="btn btn-danger mx-2"> <i class="bi bi-trash-fill"></i> Delete</a>
                         </div>
                             `
@@ -75,7 +75,7 @@ function Delete(url) {
                     if (data.success) {
                         dataTable.ajax.reload();
                         toastr.success(data.message);
-                        location.reload(true);
+                        loadDataTable(status);
                     }
                     else {
                         toastr.error(data.message);

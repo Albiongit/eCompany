@@ -10,29 +10,33 @@ namespace eCompany.Models.DTOs.Entities
 {
     public class TaskEntityDTO
     {
-        public int TaskId { get; set; }
+        public int? TaskId { get; set; }
         [Required]
-        public string? Title { get; set; }
+        public string Title { get; set; }
         public string? Description { get; set; }
-        public DateTime? AssignedDate { get; set; }
+        public string? Comment { get; set; }
+        public DateTime AssignedDate { get; set; }
         public DateTime? FinishedDate { get; set; }
+        public DateTime? DueDate { get; set; }
         [Required]
-        public int? DayDuration { get; set; }
+        public int DayDuration { get; set; }
         public Status? Status { get; set; }
-        public string? EmployeeId { get; set; }
-        [Required]
+        public string EmployeeId { get; set; }
+        
         public string? EmployeeName { get; set; }
         
 
         public int CompanyId { get; set; }
 
-        public string CompanyName { get; set; }
+        public string? CompanyName { get; set; }
         public string? CompanyPhone { get; set; }
         
         public string? CompanyState { get; set; }
 
         public string? CompanyWeb { get; set; }
+        public string? ErrorMessage { get; set; }
 
         public IEnumerable<SelectListItem>? EmployeeList { get; set; }
+        public IEnumerable<SelectListItem>? StatusList { get; set; }
     }
 }

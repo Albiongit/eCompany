@@ -37,24 +37,10 @@
                 <label asp-for="CompanyName" style="margin-left:5px;"></label>
             </div>
             <div class="form-floating py-2 col-12">
-                <textarea asp-for="Description" class="form-control" aria-required="true"></textarea>
+                <textarea asp-for="Description" cols="120" rows="5" class="form-control" style="height:auto" aria-required="true"></textarea>
                 <label asp-for="Description" style="margin-left:5px;"></label>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-           @*
-            <div class="form-floating py-2 col-6">
-                <select asp-for="Input.Role" id="Input_Role" asp-items="@Model.Input.RoleList" class="form-select" required>
-                    <option disabled selected>-Select Role-</option>
-                </select>
-                <label asp-for="Input.Role" style="margin-left:5px;"></label>
-                <span asp-validation-for="Input.Role" class="text-danger"></span>
-            </div>
-            <div class="form-floating py-2 col-6" id="Input_CompanyId" style="display:none">
-                <select asp-for="Input.CompanyId" asp-items="@Model.Input.CompanyList" class="form-select" required>
-                    <option disabled selected>-Select Company-</option>
-                </select>
-                <label asp-for="Input.CompanyId" style="margin-left:5px;" ></label>
-            </div>*@
             <br />
             <div class="form-floating py-2 col-12" style="text-align:center">
                 <a asp-area="Admin" asp-controller="Task" asp-action="Index" type="button" class="btn btn-primary btn-lg btn-block m-2">Discard Task</a>

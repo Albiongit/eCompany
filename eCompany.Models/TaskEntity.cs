@@ -14,6 +14,7 @@ namespace eCompany.Models
         [Required]
         public string Title { get; set; }
         public string Description { get; set; }
+        public string? Comment { get; set; }
         public DateTime AssignedDate { get; set; }
         public DateTime? FinishedDate { get; set; }
         public int DayDuration { get; set; }
