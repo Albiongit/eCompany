@@ -103,11 +103,83 @@ namespace eCompany.DataAccess.Repository
                                    FinishedDate = t.FinishedDate,
                                    DueDate = t.AssignedDate.AddDays(t.DayDuration),
                                    EmployeeName = aU.Name,
+                                   Comment = t.Comment,
                                    Status = t.Status
                                }).FirstOrDefault();
 
             return taskDetails;
         }
+
+
+
+        public async Task<IQueryable<TaskEntityDTO>> GetEmployeeTasks(string id, Status? status)
+        {
+
+            if (status == null)
+            {
+                var taskDetails = (from t in _db.Tasks
+                                   join c in _db.Companies on t.CompanyID equals c.CompanyId
+                                   join aU in _db.ApplicationUsers on t.EmployeeId equals aU.Id
+                                   where aU.Id == id
+                                   select new TaskEntityDTO
+                                   {
+                                       CompanyId = c.CompanyId,
+                                       CompanyName = c.CompanyName,
+                                       CompanyPhone = c.CompanyPhone,
+                                       CompanyState = c.CompanyState,
+                                       CompanyWeb = c.CompanyWeb,
+                                       TaskId = t.TaskId,
+                                       Title = t.Title,
+                                       EmployeeId = t.EmployeeId,
+                                       DayDuration = t.DayDuration,
+                                       Description = t.Description,
+                                       AssignedDate = t.AssignedDate,
+                                       FinishedDate = t.FinishedDate,
+                                       DueDate = t.AssignedDate.AddDays(t.DayDuration),
+                                       DueDateTask = t.AssignedDate.AddDays(t.DayDuration).ToString("MMMM dd, yyyy"),
+                                       EmployeeName = aU.Name,
+                                       Status = t.Status,
+                                       StatusInfo = Enum.GetName(typeof(Status), 2)     // TO DO
+                                   }).AsQueryable();
+
+                return taskDetails;
+
+            }
+            else
+            {
+                var taskDetails = (from t in _db.Tasks
+                                   join c in _db.Companies on t.CompanyID equals c.CompanyId
+                                   join aU in _db.ApplicationUsers on t.EmployeeId equals aU.Id
+                                   where aU.Id == id
+                                   where t.Status == status
+                                   select new TaskEntityDTO
+                                   {
+                                       CompanyId = c.CompanyId,
+                                       CompanyName = c.CompanyName,
+                                       CompanyPhone = c.CompanyPhone,
+                                       CompanyState = c.CompanyState,
+                                       CompanyWeb = c.CompanyWeb,
+                                       TaskId = t.TaskId,
+                                       Title = t.Title,
+                                       EmployeeId = t.EmployeeId,
+                                       DayDuration = t.DayDuration,
+                                       Description = t.Description,
+                                       AssignedDate = t.AssignedDate,
+                                       FinishedDate = t.FinishedDate,
+                                       DueDate = t.AssignedDate.AddDays(t.DayDuration),
+                                       DueDateTask = t.AssignedDate.AddDays(t.DayDuration).ToString("MMMM dd, yyyy"),
+                                       EmployeeName = aU.Name,
+                                       Status = t.Status,
+                                       StatusInfo =  Enum.GetName(typeof(Status), Status.Done)      // TO DO
+                                   }).AsQueryable();
+
+                return taskDetails;
+            }
+
+
+        }
+
+
 
 
         public void Update(TaskEntity task)

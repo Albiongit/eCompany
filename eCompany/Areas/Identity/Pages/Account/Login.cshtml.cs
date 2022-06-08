@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace eCompany.Areas.Identity.Pages.Account
 {
@@ -115,6 +116,7 @@ namespace eCompany.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

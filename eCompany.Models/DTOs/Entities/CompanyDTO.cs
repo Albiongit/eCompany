@@ -23,5 +23,7 @@ namespace eCompany.Models.DTOs.Entities
         [Required]
         [Display(Name = "Company WebSite")]
         public string? CompanyWeb { get; set; }
+
+        public string? UserId { get; set; }
     }
 }

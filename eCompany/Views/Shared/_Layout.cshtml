@@ -52,6 +52,12 @@
                                 <a id="register" class="nav-link text-light" asp-area="Identity" asp-page="/Account/Register" >Register new user</a>
                             </li>
                         }
+                        @if (User.IsInRole(SD.Role_Employee))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-area="Customer" asp-controller="Task" asp-action="Index">Tasks</a>
+                            </li>
+                        }
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

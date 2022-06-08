@@ -11,6 +11,7 @@ namespace eCompany.DataAccess.Repository.IRepository
     public interface ITaskRepository : IRepository<TaskEntity>
     {
         public Task<IQueryable<TaskEntityDTO>> GetAllTasks(int id, Status? status);
+        public Task<IQueryable<TaskEntityDTO>> GetEmployeeTasks(string id, Status? status);
         public Task<TaskEntityDTO> GetTaskDetails(int taskId);
         void Update(TaskEntity task);
 

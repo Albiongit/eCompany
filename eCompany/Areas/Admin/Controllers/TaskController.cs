@@ -174,12 +174,7 @@ namespace eCompany.Areas.Admin.Controllers
         [HttpPost]
         public async Task<JsonResult> GetTaskList(int id, Status? status)
         {
-            //var claimsIdentity = (ClaimsIdentity)User.Identity;
-            //var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-
-            //var CompanyUsers = await _unitOfWork.CompanyUsers.GetFirstOrDefaultAsync(uc => uc.UserId == claim.Value);
-            //var CompanyId = CompanyUsers.CompanyId;
-
+            
             int totalRecord = 0;
             int filterRecord = 0;
             var draw = Request.Form["draw"].FirstOrDefault();
@@ -189,7 +184,7 @@ namespace eCompany.Areas.Admin.Controllers
             int pageSize = Convert.ToInt32(Request.Form["length"].FirstOrDefault() ?? "0");
             int skip = Convert.ToInt32(Request.Form["start"].FirstOrDefault() ?? "0");
             var data = await _unitOfWork.Tasks
-                .GetAllTasks(id, status);                  // check function -- TO DO --
+                .GetAllTasks(id, status);                  
 
             totalRecord = data.Count();
 

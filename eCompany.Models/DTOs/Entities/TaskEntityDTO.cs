@@ -35,6 +35,8 @@ namespace eCompany.Models.DTOs.Entities
 
         public string? CompanyWeb { get; set; }
         public string? ErrorMessage { get; set; }
+        public string? DueDateTask { get; set; }
+        public string? StatusInfo { get; set; }
 
         public IEnumerable<SelectListItem>? EmployeeList { get; set; }
         public IEnumerable<SelectListItem>? StatusList { get; set; }
