@@ -28,6 +28,7 @@ namespace eCompany.Areas.Customer.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = SD.Role_Employee)]
         public async Task<IActionResult> Index()
         {
 

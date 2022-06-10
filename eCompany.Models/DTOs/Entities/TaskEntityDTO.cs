@@ -38,6 +38,8 @@ namespace eCompany.Models.DTOs.Entities
         public string? DueDateTask { get; set; }
         public string? StatusInfo { get; set; }
 
+        public string? SuperAdminId { get; set; }
+
         public IEnumerable<SelectListItem>? EmployeeList { get; set; }
         public IEnumerable<SelectListItem>? StatusList { get; set; }
     }

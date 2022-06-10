@@ -58,25 +58,28 @@ namespace eCompany.DataAccess.Repository
             }
             else
             {
-                var userCompanies = _db.Companies_Users
-                .Include(x => x.ApplicationUser)
-                .Where(x => x.CompanyId == companyId)
-                .Select(x => new ApplicationUserDTO
-                {
-                    Id = x.ApplicationUser.Id,
-                    Name = x.ApplicationUser.Name,
-                    Email = x.ApplicationUser.Email,
-                    PhoneNumber = x.ApplicationUser.PhoneNumber,
-                    Sex = x.ApplicationUser.Sex,
-                    City = x.ApplicationUser.City,
-                    State = x.ApplicationUser.State,
-                    ImageUrl = x.ApplicationUser.ImageUrl,
-                    CompanyName = x.Company.CompanyName,
-                    CompanyId = x.Company.CompanyId,
-                })
-                .AsQueryable();
+                var query = (from cU in _db.Companies_Users
+                             join aU in _db.ApplicationUsers on cU.UserId equals aU.Id
+                             join uR in _db.UserRoles on aU.Id equals uR.UserId
+                             join r in _db.Roles on uR.RoleId equals r.Id
+                             join c in _db.Companies on cU.CompanyId equals c.CompanyId
+                             where cU.CompanyId == companyId
+                             select new ApplicationUserDTO
+                             {
+                                 Id = aU.Id,
+                                 Name = aU.Name,
+                                 Email = aU.Email,
+                                 PhoneNumber = aU.PhoneNumber,
+                                 Sex = aU.Sex,
+                                 City = aU.City,
+                                 State = aU.State,
+                                 ImageUrl = aU.ImageUrl,
+                                 CompanyName = c.CompanyName,
+                                 CompanyId = c.CompanyId,
+                                 Role = r.Name
+                             });
 
-                return userCompanies;
+                return query;
             }
 
             
@@ -110,6 +113,7 @@ namespace eCompany.DataAccess.Repository
                 .Where(x => x.UserId == userId)
                 .Select(x => new ApplicationUserDTO
                 {
+                    Id = x.ApplicationUser.Id,
                     Name = x.ApplicationUser.Name,
                     Sex = x.ApplicationUser.Sex,
                     City = x.ApplicationUser.City,
@@ -126,7 +130,34 @@ namespace eCompany.DataAccess.Repository
 
             return userFromDb;
         }
-       
-        
+
+
+        public async Task<IQueryable<ApplicationUserDTO>> GetUserDetails(string userId)
+        {
+            var userFromDb =  _db.Companies_Users
+                .Include(x => x.ApplicationUser)
+                .Include(x => x.Company)
+                .Where(x => x.UserId == userId)
+                .Select(x => new ApplicationUserDTO
+                {
+                    Id = x.ApplicationUser.Id,
+                    Name = x.ApplicationUser.Name,
+                    Sex = x.ApplicationUser.Sex,
+                    City = x.ApplicationUser.City,
+                    State = x.ApplicationUser.State,
+                    ImageUrl = x.ApplicationUser.ImageUrl,
+                    CompanyName = x.Company.CompanyName,
+                    CompanyId = x.Company.CompanyId,
+                    PhoneNumber = x.ApplicationUser.PhoneNumber
+                })
+                .AsQueryable();
+
+
+
+
+            return userFromDb;
+        }
+
+
     }
 }

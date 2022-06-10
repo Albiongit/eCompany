@@ -29,15 +29,32 @@ function loadDataTable(role) {
         "serverSide": "true",
         "filter": "true",
         "columns": [
-            { "data": "name", "name": "Name", "width": "10%" },
-            { "data": "sex", "name": "Sex", "width": "10%" },
+            { "data": "name", "name": "Name", "width": "15%" },
             { "data": "email", "name": "Email", "width": "20%" },
-            { "data": "phoneNumber", "name": "PhoneNumber", "width": "10%" },
-            { "data": "state", "name": "State", "width": "10%" },
-            { "data": "city", "name": "City", "width": "10%" },
+            { "data": "phoneNumber", "name": "PhoneNumber", "width": "15%" },
+            {
+                "data": "id",
+                "render": function (data, data2, row) {
+                    if (row.role == "Employee") {
+                        return `
+                        
+                        <div class="w-100 btn-group" role="group">
+                        
+                        <a href="/Admin/Task/CreateTask?companyId=${id}&id=${row.id}"
+                        class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i>Assign New Task</a>
+                        
+                        </div>
+                            `
+                    } else {
+                        return ``
+                    }
+                },
+                "width": "20%"
+            },
             {
                 "data": "id",
                 "render": function (data) {
+
                     return `
                         <div class="w-75 btn-group" role="group">
                         <a href="/Admin/Manage/UpdateEmployee?id=${data}"
@@ -46,6 +63,7 @@ function loadDataTable(role) {
                         class="btn btn-danger mx-2"> <i class="bi bi-trash-fill"></i> Delete</a>
                         </div>
                             `
+
                 },
                 "width": "30%"
             }

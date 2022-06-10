@@ -8,6 +8,7 @@
         <form id="registerForm" class="row" method="post" enctype="multipart/form-data">
             <input asp-for="CompanyId" hidden />
             <input asp-for="EmployeeId" hidden />
+            <div id="SuperAdmin" hidden>@Model.SuperAdminId</div>
             <h3 style="text-align:center">Task Details</h3>
             <div style="color:red;">@Model.ErrorMessage</div>
             <hr />
@@ -59,7 +60,8 @@
             </div>
             <br />
             <div class="form-floating py-2 col-12" style="text-align:center">
-                <a asp-area="Admin" asp-controller="Task" asp-action="Index" type="button" class="btn btn-primary btn-lg btn-block m-2">Discard changes</a>
+                <a asp-area="Admin" asp-controller="Task" asp-action="Index" type="button" id="Submit_CompanyAdmin" class="btn btn-primary btn-lg btn-block m-2">Discard changes</a>
+                <a asp-area="Admin" asp-controller="Manage" asp-action="GetTasks" asp-route-companyId="@Model.CompanyId" id="Submit_SuperAdmin"  style="display:none" type="button" class="btn btn-primary btn-lg btn-block m-2">Discard changes</a>
                 <button id="registerSubmit" type="submit" class="w-90 btn btn-success btn-lg btn-block m-2">Update Task</button>
             </div>
 	        </form>
@@ -67,6 +69,22 @@
 </div>
 
 @section Scripts{
+
+    <script>
+        $(document).ready(function() {
+            var superAdmin = $('#SuperAdmin').text();
+            if(superAdmin != ""){
+                $('#Submit_SuperAdmin').show();
+                $('#Submit_CompanyAdmin').hide();
+             
+            }
+            else {
+            }
+           
+        })
+    </script>
+
+
     @{
 	<partial name="_ValidationScriptsPartial" />
 	}

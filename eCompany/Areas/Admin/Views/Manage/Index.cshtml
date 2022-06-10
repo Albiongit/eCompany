@@ -9,15 +9,13 @@
         <div class="row p-2 border">
             <a href="#" id="companyBtn" type="button" data-id="@Model.CompanyId" class="btn btn-secondary btn-lg btn-block mb-2">Company</a>
             <a asp-area="Admin" asp-controller="Manage" asp-action="GetEmployees" asp-route-id="@Model.CompanyId" id="employeeBtn" class="btn btn-light btn-lg btn-block mb-2">Employees</a>
+            <a asp-area="Admin" asp-controller="Manage" asp-action="GetTasks" asp-route-companyId="@Model.CompanyId"  class="btn btn-light btn-lg btn-block mb-2">Tasks</a>
             <a asp-area="Admin" asp-controller="Company" asp-action="Index"  id="employeeBtn" class="btn btn-info btn-lg btn-block mb-2">Back</a>
         </div>
     </div>
     <div id="partialViewUpdate" class="col-md-9" style="display:block">
         @Html.Partial("_UpdatePartial")
     </div>
-    @*<div id="partialViewEmployee" class="col-md-9" style="display:none">
-        @Html.Partial("_EmployeePartial");
-    </div>*@
 
     
 </div>

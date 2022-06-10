@@ -7,6 +7,8 @@
 <div class="row p-2 border m-auto col-8"  >
     <div class="col-md-12">
         <form id="registerForm" class="row" method="post" enctype="multipart/form-data">
+            <div id="Employee" hidden >@Model.EmployeeName</div>
+            <div id="SuperAdmin" hidden >@Model.SuperAdminId</div>
             <h3 style="text-align:center">Create a new Task</h3>
             <hr />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -15,9 +17,16 @@
                 <label asp-for="Title" style="margin-left:5px;"></label>
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
-            <div class="form-floating py-2 col-6">
-                <select asp-for="EmployeeId" asp-items="@Model.EmployeeList" class="form-select" required>
+            <div class="form-floating py-2 col-6" id="Input_Employee">
+                <select asp-for="EmployeeId"  asp-items="@Model.EmployeeList" class="form-select" required>
                     <option disabled selected>-Select Employee-</option>
+                </select>
+                <label asp-for="EmployeeName" style="margin-left:5px;"></label>
+                <span asp-validation-for="EmployeeId" class="text-danger"></span>
+            </div>
+            <div class="form-floating py-2 col-6" id="Input_EmployeeId2" style="display:none">
+                <select asp-for="EmployeeId" asp-items="@Model.EmployeeList" class="form-select" required>
+                   
                 </select>
                 <label asp-for="EmployeeName" style="margin-left:5px;"></label>
                 <span asp-validation-for="EmployeeId" class="text-danger"></span>
@@ -43,7 +52,8 @@
             </div>
             <br />
             <div class="form-floating py-2 col-12" style="text-align:center">
-                <a asp-area="Admin" asp-controller="Task" asp-action="Index" type="button" class="btn btn-primary btn-lg btn-block m-2">Discard Task</a>
+                <a asp-area="Admin" asp-controller="Task" asp-action="Index" id="Submit_CompanyAdmin" type="button" class="btn btn-primary btn-lg btn-block m-2">Discard Task</a>
+                <a asp-area="Admin" asp-controller="Manage" asp-action="GetTasks" asp-route-companyId="@Model.CompanyId" id="Submit_SuperAdmin" style="display:none" type="button" class="btn btn-primary btn-lg btn-block m-2">Discard Task</a>
                 <button id="registerSubmit" type="submit" class="w-90 btn btn-success btn-lg btn-block m-2">Assign Task</button>
             </div>
 	        </form>
@@ -51,7 +61,25 @@
 </div>
 
 @section Scripts{
-    @{
-	<partial name="_ValidationScriptsPartial" />
-	}
+
+    <script>
+        $(document).ready(function() {
+            var employee = $('#Employee').text();
+            if(employee != ""){
+                $('#Input_EmployeeId2').show();
+                $('#Input_Employee').hide();
+             
+            }
+
+            var superAdmin = $('#SuperAdmin').text();
+            if(superAdmin != ""){
+                $('#Submit_SuperAdmin').show();
+                $('#Submit_CompanyAdmin').hide();
+             
+            }
+
+           
+        })
+    </script>
+   
 }

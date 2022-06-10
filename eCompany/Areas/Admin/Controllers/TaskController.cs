@@ -26,6 +26,7 @@ namespace eCompany.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = SD.Role_Admin + "," + SD.Role_SuperAdmin)]
         public async Task<IActionResult> Index()
         {
 
@@ -47,18 +48,45 @@ namespace eCompany.Areas.Admin.Controllers
         //Create Task - GET
         [HttpGet]
         [Authorize(Roles = SD.Role_SuperAdmin + "," + SD.Role_Admin)]
-        public async Task<IActionResult> CreateTask(int companyId)
+        public async Task<IActionResult> CreateTask(int companyId, string? id)
         {
             TaskEntityDTO taskEntityDTO = new TaskEntityDTO();
             taskEntityDTO.CompanyId = companyId;
 
-            var getAllEmployees = await _unitOfWork.CompanyUsers.GetAllUsers(companyId, "Employee");
-
-            taskEntityDTO.EmployeeList = getAllEmployees.Select(x => new SelectListItem
+            // Super Admin check
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            var companyAdmin = await _unitOfWork.CompanyUsers.GetUserProfile(claim.Value);
+            if (companyAdmin == null)
             {
-                Text = x.Name,
-                Value = x.Id.ToString()
-            });
+                //So its Super Admin
+                taskEntityDTO.SuperAdminId = claim.Value;
+            }
+
+            if (id == null)
+            {
+
+                var getAllEmployees = await _unitOfWork.CompanyUsers.GetAllUsers(companyId, "Employee");
+
+                taskEntityDTO.EmployeeList = getAllEmployees.Select(x => new SelectListItem
+                {
+                    Text = x.Name,
+                    Value = x.Id.ToString()
+                });
+            }else
+            {
+                var getEmployee = await _unitOfWork.CompanyUsers.GetUserDetails(id);
+                var employee = await _unitOfWork.ApplicationUser.GetFirstOrDefaultAsync(u => u.Id == id);
+                taskEntityDTO.EmployeeName = employee.Name;
+                
+                taskEntityDTO.EmployeeList = getEmployee.Select(x => new SelectListItem
+                {
+                    Text = x.Name,
+                    Value = x.Id.ToString()
+                });
+
+                
+            }
 
             var company = await _unitOfWork.Company.GetFirstOrDefaultAsync(c => c.CompanyId == companyId);
             taskEntityDTO.CompanyName = company.CompanyName;
@@ -75,6 +103,11 @@ namespace eCompany.Areas.Admin.Controllers
         [Authorize(Roles = SD.Role_Admin + "," + SD.Role_SuperAdmin)]
         public async Task<IActionResult> CreateTask(TaskEntityDTO taskEntityDTO)
         {
+            // Super Admin check
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            var companyAdmin = await _unitOfWork.CompanyUsers.GetUserProfile(claim.Value);
+            
 
             if (ModelState.IsValid)
             {
@@ -95,7 +128,13 @@ namespace eCompany.Areas.Admin.Controllers
 
                 _unitOfWork.Save();
 
-                return RedirectToAction("Index", "Task");
+                if(companyAdmin != null)
+                {
+                    return RedirectToAction("Index", "Task");
+                }
+
+                // Otherwise if its Super Admin then
+                return RedirectToAction("GetTasks", "Manage", new { companyId = taskEntityDTO.CompanyId });
 
             }
 
@@ -109,7 +148,16 @@ namespace eCompany.Areas.Admin.Controllers
         {
             var taskEntity = await _unitOfWork.Tasks.GetTaskDetails(taskId);
 
-           
+            // Super Admin check
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            var companyAdmin = await _unitOfWork.CompanyUsers.GetUserProfile(claim.Value);
+            if(companyAdmin == null)
+            {
+                //So its Super Admin
+                taskEntity.SuperAdminId = claim.Value;
+            }
+
             taskEntity.StatusList = new SelectList(Enum.GetNames(typeof(Status)));
             taskEntity.ErrorMessage = errorMessage;
 
@@ -218,7 +266,7 @@ namespace eCompany.Areas.Admin.Controllers
 
 
         [HttpDelete]
-        [Authorize(Roles = SD.Role_Admin)]
+        [Authorize(Roles = SD.Role_Admin + "," + SD.Role_SuperAdmin)]
         public async Task<IActionResult> Delete(int taskId)
         {
             var taskEntity = await _unitOfWork.Tasks.GetFirstOrDefaultAsync(t => t.TaskId == taskId);
