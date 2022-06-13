@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Configuration;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +12,22 @@ namespace eCompany.Shared
 {
     public class EmailSender : IEmailSender
     {
-        public Task SendEmailAsync(string email, string subject, string htmlMessage)
+        public string SendGridSecret { get; set; }
+
+        public EmailSender(IConfiguration _config)
         {
-            return Task.CompletedTask;
+            SendGridSecret = _config.GetValue<string>("SendGrid:SecretKey");
+        }
+
+
+        public async Task SendEmailAsync(string email, string subject, string htmlMessage)
+        {
+            var client = new SendGridClient(SendGridSecret);
+            var from = new EmailAddress("albion.ademi@comitas.com", "eCompany");
+            var to = new EmailAddress(email, "End User");
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, "", htmlMessage);
+
+            var response = await client.SendEmailAsync(msg);
         }
     }
 }

@@ -257,25 +257,6 @@ namespace eCompany.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    //ReturnUrl = returnUrl;
-                    //ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-                    //var companyLista = await _unitOfWork.Company.GetAllAsync();
-
-                    //Input = new InputModel()
-                    //{
-                    //    RoleList = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
-                    //    {
-                    //        Text = i,
-                    //        Value = i
-                    //    }),
-
-
-                    //    CompanyList = companyLista.Select(i => new SelectListItem
-                    //    {
-                    //        Text = i.CompanyName,
-                    //        Value = i.CompanyId.ToString()
-                    //    })
-                    //};
                     RedirectToAction("Index", new { Area = "Customer" });
                 }
 
@@ -385,7 +366,7 @@ namespace eCompany.Areas.Identity.Pages.Account
                         else if (adminStatus != null)
                         {
                             ErrorText = "";
-                            return RedirectToAction("GetAll", "Employe", new { Area = "Admin"});
+                            return RedirectToAction("Index", "Employee", new { Area = "Admin"});
                         } else
                         {
                             ErrorText = "";

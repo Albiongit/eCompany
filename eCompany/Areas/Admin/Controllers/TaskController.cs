@@ -8,6 +8,7 @@ using System.Linq.Dynamic.Core;
 using Microsoft.AspNetCore.Authorization;
 using eCompany.Shared;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace eCompany.Areas.Admin.Controllers
 {
@@ -16,13 +17,15 @@ namespace eCompany.Areas.Admin.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ApplicationDbContext _db;
+        private readonly IEmailSender _emailSender;
 
         private string errorMessage = "";
 
-        public TaskController(IUnitOfWork unitOfWork, ApplicationDbContext db)
+        public TaskController(IUnitOfWork unitOfWork, ApplicationDbContext db, IEmailSender emailSender)
         {
             _unitOfWork = unitOfWork;
             _db = db;
+            _emailSender = emailSender;
         }
 
         [HttpGet]
@@ -127,6 +130,12 @@ namespace eCompany.Areas.Admin.Controllers
                 TempData["success"] = "Task created successfully!";
 
                 _unitOfWork.Save();
+                var selectedEmployee = await _unitOfWork.CompanyUsers.GetUserProfile(taskEntityDTO.EmployeeId);
+                string employeeEmail = selectedEmployee.Email;
+
+                // send email for task confirmation
+                await _emailSender.SendEmailAsync(employeeEmail, "New Task - " + taskEntityDTO.CompanyName, "<p>New task assigned \" "+ taskEntityDTO.Title +" \" for you, visit the webpage for the task details.</br>" +
+                                                                                                         "Task assigned from "+ companyAdmin.Name +" - "+ companyAdmin.CompanyName +" Company.</p>");
 
                 if(companyAdmin != null)
                 {

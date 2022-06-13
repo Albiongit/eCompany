@@ -116,6 +116,7 @@ namespace eCompany.DataAccess.Repository
                     Id = x.ApplicationUser.Id,
                     Name = x.ApplicationUser.Name,
                     Sex = x.ApplicationUser.Sex,
+                    Email = x.ApplicationUser.Email,
                     City = x.ApplicationUser.City,
                     State = x.ApplicationUser.State,
                     ImageUrl = x.ApplicationUser.ImageUrl,
