@@ -9,19 +9,19 @@
         <form id="registerForm" class="row" method="post" enctype="multipart/form-data">
             <div id="Employee" hidden >@Model.EmployeeName</div>
             <div id="SuperAdmin" hidden >@Model.SuperAdminId</div>
+            <div id="CompanyId" hidden >@Model.CompanyId</div>
             <h3 style="text-align:center">Create a new Task</h3>
             <hr />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-floating py-2 col-12">
-                <input asp-for="Title" class="form-control" aria-required="true" />
+                <input asp-for="Title" class="form-control" style="border-radius:5px;" aria-required="true" />
                 <label asp-for="Title" style="margin-left:5px;"></label>
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
-            <div class="form-floating py-2 col-6" id="Input_Employee">
-                <select asp-for="EmployeeId"  asp-items="@Model.EmployeeList" class="form-select" required>
-                    <option disabled selected>-Select Employee-</option>
+            <div class="form-group py-2 col-6 "  id="Input_Employee">
+                <select asp-for="EmployeeId"  class="form-select" id="ajaxSelect2" >
+
                 </select>
-                <label asp-for="EmployeeName" style="margin-left:5px;"></label>
                 <span asp-validation-for="EmployeeId" class="text-danger"></span>
             </div>
             <div class="form-floating py-2 col-6" id="Input_EmployeeId2" style="display:none">
@@ -32,21 +32,21 @@
                 <span asp-validation-for="EmployeeId" class="text-danger"></span>
             </div>
             <div class="form-floating py-2 col-6">
-                <input asp-for="DayDuration" type="number" min="1" class="form-control" aria-required="true" />
+                <input asp-for="DayDuration" type="number" min="1" class="form-control" style="border-radius:5px;" aria-required="true" />
                 <label asp-for="DayDuration" style="margin-left:5px;"></label>
                 <span asp-validation-for="DayDuration" class="text-danger"></span>
             </div>
             <div class="form-floating py-2 col-6">
-                <input asp-for="AssignedDate" type="date" class="form-control" aria-required="true" />
+                <input asp-for="AssignedDate" type="date" class="form-control" style="border-radius:5px;" aria-required="true" />
                 <label asp-for="AssignedDate" style="margin-left:5px;"></label>
                 <span asp-validation-for="AssignedDate" class="text-danger"></span>
             </div>
             <div class="form-floating py-2 col-6">
-                <input asp-for="CompanyName" readonly class="form-control" />
+                <input asp-for="CompanyName" readonly class="form-control" style="border-radius:5px;" />
                 <label asp-for="CompanyName" style="margin-left:5px;"></label>
             </div>
             <div class="form-floating py-2 col-12">
-                <textarea asp-for="Description" cols="120" rows="5" class="form-control" style="height:auto" aria-required="true"></textarea>
+                <textarea asp-for="Description" cols="120" rows="5" class="form-control" style="height:auto; border-radius:5px;" aria-required="true"></textarea>
                 <label asp-for="Description" style="margin-left:5px;"></label>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
@@ -77,9 +77,14 @@
                 $('#Submit_CompanyAdmin').hide();
              
             }
-
+   
            
-        })
+        });
+
+
+
     </script>
+    <script src="~/lib/select2/js/select2.full.min.js"></script>
+    <script src="~/js/select2.js"></script>
    
 }

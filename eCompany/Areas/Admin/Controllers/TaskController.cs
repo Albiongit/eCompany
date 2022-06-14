@@ -100,6 +100,27 @@ namespace eCompany.Areas.Admin.Controllers
         }
 
 
+        // Select for dropdown list of employees
+        [HttpGet]
+        public async Task<IActionResult> Search(int companyId, string term)
+        {
+            if (!string.IsNullOrEmpty(term))
+            {
+                var getEmployees = await _unitOfWork.CompanyUsers.GetAllUsers(companyId, "Employee");
+                var data = getEmployees.Where(e => e.Name.Contains(term)).ToList().Take(5);
+                return Ok(data);
+            }
+            else
+            {
+                var getEmployees = await _unitOfWork.CompanyUsers.GetAllUsers(companyId, "Employee");
+                var data = getEmployees.ToList().Take(5);
+                return Ok(data);
+            }
+        }
+
+
+
+
         //Create Task - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -134,8 +155,9 @@ namespace eCompany.Areas.Admin.Controllers
                 string employeeEmail = selectedEmployee.Email;
 
                 // send email for task confirmation
-                await _emailSender.SendEmailAsync(employeeEmail, "New Task - " + taskEntityDTO.CompanyName, "<p>New task assigned \" "+ taskEntityDTO.Title +" \" for you, visit the webpage for the task details.</br>" +
-                                                                                                         "Task assigned from "+ companyAdmin.Name +" - "+ companyAdmin.CompanyName +" Company.</p>");
+
+                //await _emailSender.SendEmailAsync(employeeEmail, "New Task - " + taskEntityDTO.CompanyName, "<p>New task assigned \" "+ taskEntityDTO.Title +" \" for you, visit the webpage for the task details.</br>" +
+                //                                                                                         "Task assigned from "+ companyAdmin.Name +" - "+ companyAdmin.CompanyName +" Company.</p>");
 
                 if(companyAdmin != null)
                 {

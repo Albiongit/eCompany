@@ -32,7 +32,8 @@ namespace eCompany.DataAccess.Repository
 
             if(role != null)
             {
-                var query = (from cU in _db.Companies_Users
+                var query = (
+                             from cU in _db.Companies_Users
                              join aU in _db.ApplicationUsers on cU.UserId equals aU.Id
                              join uR in _db.UserRoles on aU.Id equals uR.UserId
                              join r in _db.Roles on uR.RoleId equals r.Id
