@@ -58,6 +58,12 @@
                             <li class="nav-item">
                                 <a class="nav-link text-light" asp-area="Customer" asp-controller="Task" asp-action="Index">Tasks</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-light"  >
+                                    <i class="far fa-bell" id="taskCount"> </i>
+                                </a>
+                                
+                            </li>
                         }
                     </ul>
                     <partial name="_LoginPartial" />
@@ -86,6 +92,7 @@
     <link href="~/lib/select2/css/select2.min.css" rel="stylesheet" />
     <link href="https://raw.githack.com/ttskch/select2-bootstrap4-theme/master/dist/select2-bootstrap4.css" rel="stylesheet">
 	<script src="//cdn.datatables.net/1.11.2/js/jquery.dataTables.min.js"></script>
+    <script src="~/js/checkData.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

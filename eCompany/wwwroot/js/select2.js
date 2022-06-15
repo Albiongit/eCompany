@@ -29,10 +29,20 @@ $("#simpleSelect2").select2({
 
                         return {
                             id: item.id,
-                            text: item.name
+                            text: item.name,
+                            html: '<div style="display:flex;"><div class="d-flex justify-content-center"><img src="' + item.imageUrl + '" alt="" style="height:40px;width:40px;object-fit:cover;" class="img-rounded img-responsive m-auto" /></div><div style="padding:10px" ><div style="font-size: 1.2em">' + item.name  + '</div></div></div >',
+
                         };
                     }),
                 };
             }
+        },
+        templateResult: template,
+        escapeMarkup: function (m) {
+            return m;
         }
     });
+
+function template(data) {
+    return data.html;
+}

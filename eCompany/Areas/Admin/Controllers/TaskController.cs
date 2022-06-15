@@ -156,15 +156,18 @@ namespace eCompany.Areas.Admin.Controllers
 
                 // send email for task confirmation
 
-                //await _emailSender.SendEmailAsync(employeeEmail, "New Task - " + taskEntityDTO.CompanyName, "<p>New task assigned \" "+ taskEntityDTO.Title +" \" for you, visit the webpage for the task details.</br>" +
-                //                                                                                         "Task assigned from "+ companyAdmin.Name +" - "+ companyAdmin.CompanyName +" Company.</p>");
+                
 
-                if(companyAdmin != null)
+                if (companyAdmin != null)
                 {
+                    await _emailSender.SendEmailAsync(employeeEmail, "New Task - " + taskEntityDTO.CompanyName, "<p>New task assigned \" " + taskEntityDTO.Title + " \" for you, visit the webpage for the task details.</br>" +
+                                                                                                         "Task assigned from " + companyAdmin.Name + " - " + companyAdmin.CompanyName + " Company.</p>");
                     return RedirectToAction("Index", "Task");
                 }
 
                 // Otherwise if its Super Admin then
+                await _emailSender.SendEmailAsync(employeeEmail, "New Task - " + taskEntityDTO.CompanyName, "<p>New task assigned \" " + taskEntityDTO.Title + " \" for you, visit the webpage for the task details.</br>" +
+                                                                                                         "Task assigned from Super Admin - " + selectedEmployee.CompanyName + " Company.</p>");
                 return RedirectToAction("GetTasks", "Manage", new { companyId = taskEntityDTO.CompanyId });
 
             }
@@ -269,11 +272,11 @@ namespace eCompany.Areas.Admin.Controllers
 
             if (!string.IsNullOrEmpty(searchValue))
             {
-                data = data.Where(x => x.TaskId == Int32.Parse(searchValue) ||
-                                  x.Title.ToLower().Contains(searchValue.ToLower()));
+                data = data.Where(x =>  x.Title.ToLower().Contains(searchValue.ToLower()));
             }
 
             filterRecord = data.Count();
+            
 
             if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
             {
@@ -282,6 +285,7 @@ namespace eCompany.Areas.Admin.Controllers
 
 
             var taskList = data.Skip(skip).Take(pageSize).ToList();
+            
 
 
             var returnObj = new
@@ -294,6 +298,7 @@ namespace eCompany.Areas.Admin.Controllers
 
             return Json(returnObj);
         }
+
 
 
         [HttpDelete]

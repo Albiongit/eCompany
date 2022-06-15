@@ -155,7 +155,7 @@ namespace eCompany.Areas.Customer.Controllers
 
             if (!string.IsNullOrEmpty(searchValue))
             {
-                data = data.Where(x => x.TaskId == Int32.Parse(searchValue) ||
+                data = data.Where(x =>
                                   x.Title.ToLower().Contains(searchValue.ToLower()));
             }
 
@@ -179,6 +179,26 @@ namespace eCompany.Areas.Customer.Controllers
             };
 
             return Json(returnObj);
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> CheckTasks()
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+            int taskCount = 0;
+            if (claim == null)
+            {
+                return Json(new { taskCount }) ;
+            }
+            var newTasks = await _unitOfWork.Tasks.GetEmployeeTasks(claim.Value, Status.New);
+
+            taskCount = newTasks.Count();
+
+            return Json(new { taskCount });
         }
 
 

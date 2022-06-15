@@ -56,6 +56,7 @@ function loadDataTable(status) {
     })
 }
 
+
 function Delete(url) {
     Swal.fire({
         title: 'Are you sure?',
