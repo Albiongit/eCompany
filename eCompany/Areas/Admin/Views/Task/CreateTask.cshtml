@@ -8,6 +8,7 @@
     <div class="col-md-12">
         <form id="registerForm" class="row" method="post" enctype="multipart/form-data">
             <div id="Employee" hidden >@Model.EmployeeName</div>
+            <div id="EmployeeId">@Model.EmployeeId</div>
             <div id="SuperAdmin" hidden >@Model.SuperAdminId</div>
             <div id="CompanyId" hidden >@Model.CompanyId</div>
             <h3 style="text-align:center">Create a new Task</h3>
@@ -18,8 +19,8 @@
                 <label asp-for="Title" style="margin-left:5px;"></label>
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
-            <div class="form-group py-2 col-6 "  id="Input_Employee">
-                <select asp-for="EmployeeId"  class="form-select" autocomplete="off" id="ajaxSelect2" >
+            <div class="form-floating py-2 col-6 "  id="Input_Employee">
+                <select asp-for="EmployeeId"  class="form-control" autocomplete="off" id="ajaxSelect2" >
                 </select>
                 <span asp-validation-for="EmployeeId" class="text-danger"></span>
             </div>
@@ -76,15 +77,15 @@
                 $('#Submit_CompanyAdmin').hide();
              
             }
-   
-           
+        
         });
 
-
-
     </script>
+    
     <script src="~/lib/select2/js/select2.full.min.js"></script>
     <script src="~/js/select2.js"></script>
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/updateTaskList.js"></script>
     
     <partial name="_ValidationScriptsPartial" />
 

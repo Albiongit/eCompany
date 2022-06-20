@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using eCompany.Shared;
 using eCompany.Areas.Admin.Controllers;
 using Microsoft.AspNetCore.Authorization;
+using eCompany.Hubs;
+
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection");;
@@ -23,9 +25,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
 
 builder.Services.AddIdentity<IdentityUser,IdentityRole>().AddDefaultTokenProviders()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddSignalR();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddSingleton<IEmailSender, EmailSender>();
+
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -55,5 +59,7 @@ app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
     pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<TaskHub>("/taskHub");
 
 app.Run();

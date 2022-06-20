@@ -1,10 +1,5 @@
 ﻿var timeOutId = 0;
-//we define our function and STORE it in a var
 
-//$(document).ready(function () {
-
-//    ajaxFn();
-//});
 
  function ajaxFn() {
     $.ajax({

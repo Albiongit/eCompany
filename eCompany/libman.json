@@ -5,6 +5,15 @@
     {
       "library": "select2@4.0.13",
       "destination": "wwwroot/lib/select2/"
+    },
+    {
+      "provider": "unpkg",
+      "library": "@microsoft/signalr@latest",
+      "destination": "wwwroot/lib/microsoft/signalr/",
+      "files": [
+        "dist/browser/signalr.js",
+        "dist/browser/signalr.min.js"
+      ]
     }
   ]
 }

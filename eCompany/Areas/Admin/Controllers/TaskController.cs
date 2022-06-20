@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using eCompany.Shared;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace eCompany.Areas.Admin.Controllers
 {
@@ -81,6 +82,7 @@ namespace eCompany.Areas.Admin.Controllers
                 var getEmployee = await _unitOfWork.CompanyUsers.GetUserDetails(id);
                 var employee = await _unitOfWork.ApplicationUser.GetFirstOrDefaultAsync(u => u.Id == id);
                 taskEntityDTO.EmployeeName = employee.Name;
+                taskEntityDTO.EmployeeId = id;
                 
                 taskEntityDTO.EmployeeList = getEmployee.Select(x => new SelectListItem
                 {
@@ -151,6 +153,12 @@ namespace eCompany.Areas.Admin.Controllers
                 TempData["success"] = "Task created successfully!";
 
                 _unitOfWork.Save();
+
+                //HubConnection connection = new HubConnectionBuilder().WithUrl("https://localhost:44384//taskHub").Build();
+                ////await connection.StartAsync();
+                //await connection.InvokeAsync("UpdateTaskTable", taskEntityDTO.EmployeeId);
+                //await connection.DisposeAsync();
+
                 var selectedEmployee = await _unitOfWork.CompanyUsers.GetUserProfile(taskEntityDTO.EmployeeId);
                 string employeeEmail = selectedEmployee.Email;
 

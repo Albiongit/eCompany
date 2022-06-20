@@ -31,9 +31,11 @@ function loadDataTable(status) {
             "type": "POST",
             "data": { id: id, status: status }
         },
+        
         "proccesing": "true",
         "serverSide": "true",
         "filter": "true",
+        "stateSave": "true",
         "columns": [
             { "data": "taskId", "name": "TaskId", "width": "10%" },
             { "data": "title", "name": "Title", "width": "25%" },
@@ -41,12 +43,12 @@ function loadDataTable(status) {
             { "data": "status", "name": "Status", "width": "15%" },
             {
                 "data": "taskId",
-                "render": function (data) {
+                "render": function (data, data2, row) {
                     return `
                         <div class="w-75 btn-group" role="group">
                         <a href="/Admin/Task/Details?taskId=${data}"
                         class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i> Details</a>
-                        <a onClick=Delete('/Admin/Task/Delete?taskId=${data}')
+                        <a onClick=Delete('/Admin/Task/Delete?taskId=${data}&id=${row.employeeId}')
                         class="btn btn-danger mx-2"> <i class="bi bi-trash-fill"></i> Delete</a>
                         </div>
                             `
@@ -71,8 +73,16 @@ function Delete(url) {
             $.ajax({
                 url: url,
                 type: 'DELETE',
-                success: function (data) {
+                success: function(data) {
                     if (data.success) {
+                        "use strict";
+
+                        var connection = new signalR.HubConnectionBuilder().withUrl("/taskHub").build();
+                        connection.start();
+
+                        connection.invoke("DeleteTask", data.id);
+                         
+                        
                         dataTable.ajax.reload();
                         toastr.success(data.message);
                         loadDataTable(status);
