@@ -1,4 +1,10 @@
-﻿var dataTable;
+﻿"use strict";
+
+
+var connection = new signalR.HubConnectionBuilder().withUrl("/taskHub").build();
+connection.start();
+
+var dataTable;
 
 $(document).ready(function () {
     var url = window.location.search;
@@ -19,6 +25,8 @@ $(document).ready(function () {
 
 
     loadDataTable(status);
+    
+    
 
 });
 
@@ -31,11 +39,10 @@ function loadDataTable(status) {
             "type": "POST",
             "data": { id: id, status: status }
         },
-        
+        "stateSave": "true",
         "proccesing": "true",
         "serverSide": "true",
         "filter": "true",
-        "stateSave": "true",
         "columns": [
             { "data": "taskId", "name": "TaskId", "width": "10%" },
             { "data": "title", "name": "Title", "width": "25%" },
@@ -75,14 +82,8 @@ function Delete(url) {
                 type: 'DELETE',
                 success: function(data) {
                     if (data.success) {
-                        "use strict";
-
-                        var connection = new signalR.HubConnectionBuilder().withUrl("/taskHub").build();
-                        connection.start();
-
-                        connection.invoke("DeleteTask", data.id);
-                         
                         
+                                                
                         dataTable.ajax.reload();
                         toastr.success(data.message);
                         loadDataTable(status);
@@ -92,7 +93,33 @@ function Delete(url) {
                     }
                 }
             })
-            location.reload(true);
+            var id = url.substring(url.lastIndexOf('=') + 1);
+            onDeleteTask(id);
+            redrawAfterDelete($('#tblData').DataTable());
+            
         }
     })
+};
+
+function onDeleteTask(id)
+{
+    
+    connection.invoke("DeleteTask", id);
+};
+
+function redrawAfterDelete(tableToRedraw) {
+    var info = tableToRedraw.page.info();
+
+    if (info.page > 0) {
+        // when we are in the second page or above
+        if (info.recordsTotal - 1 > info.page * info.length) {
+            // after removing 1 from the total, there are still more elements
+            // than the previous page capacity 
+            location.reload(null, false);
+        } else {
+            // there are less elements, so we navigate to the previous page
+            tableToRedraw.page('previous').draw('page');
+            /*location.reload(null, false);*/
+        }
+    }
 }

@@ -31,6 +31,7 @@ function loadDataTable(status) {
             "type": "POST",
             "data": { id: id, status: status }
         },
+        "stateSave": "true",
         "proccesing": "true",
         "serverSide": "true",
         "filter": "true",
@@ -82,7 +83,25 @@ function Delete(url) {
                     }
                 }
             })
-            location.reload(true);
+            redrawAfterDelete($('#tblData').DataTable());
         }
     })
+};
+
+
+function redrawAfterDelete(tableToRedraw) {
+    var info = tableToRedraw.page.info();
+
+    if (info.page > 0) {
+        // when we are in the second page or above
+        if (info.recordsTotal - 1 > info.page * info.length) {
+            // after removing 1 from the total, there are still more elements
+            // than the previous page capacity 
+            location.reload(null, false);
+        } else {
+            // there are less elements, so we navigate to the previous page
+            tableToRedraw.page('previous').draw('page');
+            /*location.reload(null, false);*/
+        }
+    }
 }

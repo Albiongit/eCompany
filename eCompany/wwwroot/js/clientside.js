@@ -13,8 +13,10 @@ connection.on("ReceiveId", function (employeeId) {
 });
 
 
-connection.on("ReceiveDelete", function () {
-    
+connection.on("ReceiveDelete", function (id) {
+
+    if (currentEmployeeId == id) {
         document.location.reload(true);
+    }
     
 });

@@ -311,7 +311,7 @@ namespace eCompany.Areas.Admin.Controllers
 
         [HttpDelete]
         [Authorize(Roles = SD.Role_Admin + "," + SD.Role_SuperAdmin)]
-        public async Task<IActionResult> Delete(int taskId)
+        public async Task<IActionResult> Delete(int taskId, string? id)
         {
             var taskEntity = await _unitOfWork.Tasks.GetFirstOrDefaultAsync(t => t.TaskId == taskId);
 
