@@ -139,7 +139,7 @@ namespace eCompany.DataAccess.Repository
                                        DueDateTask = t.AssignedDate.AddDays(t.DayDuration).ToString("MMMM dd, yyyy"),
                                        EmployeeName = aU.Name,
                                        Status = t.Status,
-                                       StatusInfo = Enum.GetName(typeof(Status), 2)     // TO DO
+                                       /*StatusInfo = Enum.GetName(typeof(Status), 2) */    // TO DO
                                    }).AsQueryable();
 
                 return taskDetails;
@@ -170,7 +170,7 @@ namespace eCompany.DataAccess.Repository
                                        DueDateTask = t.AssignedDate.AddDays(t.DayDuration).ToString("MMMM dd, yyyy"),
                                        EmployeeName = aU.Name,
                                        Status = t.Status,
-                                       StatusInfo =  Enum.GetName(typeof(Status), Status.Done)      // TO DO
+                                       /*StatusInfo =  Enum.GetName(typeof(Status), Status.Done)   */   // TO DO
                                    }).AsQueryable();
 
                 return taskDetails;

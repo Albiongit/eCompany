@@ -1,74 +1,66 @@
-﻿var dataTable;
+﻿"use strict";
+
+
+var connection = new signalR.HubConnectionBuilder().withUrl("/taskHub").build();
+connection.start();
+
+var dataTable;
 
 $(document).ready(function () {
     var url = window.location.search;
-    var role = "";
-    if (url.includes("employees")) {
-        role = "Employee"
-    } else if (url.includes("admins")) {
-        role = "Company Admin"
+    var status = "";
+    if (url.includes("New")) {
+        status = "New"
+    } else if (url.includes("Active")) {
+        status = "Active"
+    } else if (url.includes("Problem")) {
+        status = "Problem";
+    } else if (url.includes("Rejected")) {
+        status = "Rejected";
+    } else if (url.includes("Done")) {
+        status = "Done";
     } else {
-        role = "";
+        status = "";
     }
 
 
-    loadDataTable(role);
+    loadDataTable(status);
+
+
+
 });
 
-function loadDataTable(role) {
+
+function loadDataTable(status) {
     var id = $('#tblData').attr('data-id');
     dataTable = $('#tblData').DataTable({
         "ajax": {
-            "url": "/Admin/Employee/GetEmployeeList",
+            "url": "/Admin/Task/GetUserTasks",
             "type": "POST",
-            "data": {status: role }
+            "data": { id: id, status: status }
         },
         "stateSave": "true",
         "proccesing": "true",
         "serverSide": "true",
         "filter": "true",
         "columns": [
-            {"data": "name", "name": "Name", "width": "15%"},
-            {"data": "email", "name": "Email", "width": "20%"},
-            {"data": "phoneNumber", "name": "PhoneNumber", "width": "15%" },
+            { "data": "taskId", "name": "TaskId", "width": "10%" },
+            { "data": "title", "name": "Title", "width": "25%" },
+            { "data": "employeeName", "name": "EmployeeName", "width": "25%" },
+            { "data": "status", "name": "Status", "width": "15%" },
             {
-                "data": "id",
+                "data": "taskId",
                 "render": function (data, data2, row) {
-                    if (row.role == "Employee") {
-                        return `
-                        
-                        <div class="w-100 btn-group" role="group">
-                        
-                        <a href="/Admin/Task/CreateTask?companyId=${id}&id=${row.id}"
-                        class="btn btn-primary mx-2"></i>Assign Task</a>
-                        <a href="/Admin/Task/Activity?id=${data}"
-                        class="btn btn-primary mx-2"></i>Activity</a>
-
-                        </div>
-                            `
-                    } else {
-                        return ``
-                    }
-                },
-                "width": "25%"
-            },
-            {
-                "data": "id",
-                "render": function (data) {
-                    
-                        return `
-                        
-                        <div class="w-100 btn-group" role="group">
-                        <a href="/Admin/Employee/Update?id=${data}"
-                        class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i> Edit</a>
-                        
-                        <a onClick=Delete('/Admin/Employee/Delete?userId=${data}')
+                    return `
+                        <div class="w-75 btn-group" role="group">
+                        <a href="/Admin/Task/Details?taskId=${data}"
+                        class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i> Details</a>
+                        <a onClick=Delete('/Admin/Task/Delete?taskId=${data}&id=${row.employeeId}')
                         class="btn btn-danger mx-2"> <i class="bi bi-trash-fill"></i> Delete</a>
                         </div>
                             `
-                   
                 },
-                "width": "25%"
+                "width": "30%"
             }
         ]
     })
@@ -82,7 +74,7 @@ function Delete(url) {
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText:  "Yes, delete it!"
+        confirmButtonText: "Yes, delete it!"
     }).then((willDelete) => {
         if (willDelete.isConfirmed) {
             $.ajax({
@@ -90,19 +82,29 @@ function Delete(url) {
                 type: 'DELETE',
                 success: function (data) {
                     if (data.success) {
-                        dataTable.ajax.reload(null,false);
+
+
+                        dataTable.ajax.reload();
                         toastr.success(data.message);
+                        loadDataTable(status);
                     }
                     else {
                         toastr.error(data.message);
                     }
                 }
             })
+            var id = url.substring(url.lastIndexOf('=') + 1);
+            onDeleteTask(id);
             redrawAfterDelete($('#tblData').DataTable());
+
         }
     })
 };
 
+function onDeleteTask(id) {
+
+    connection.invoke("DeleteTask", id);
+};
 
 function redrawAfterDelete(tableToRedraw) {
     var info = tableToRedraw.page.info();

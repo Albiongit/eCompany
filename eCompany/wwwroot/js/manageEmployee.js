@@ -42,22 +42,24 @@ function loadDataTable(role) {
                         <div class="w-100 btn-group" role="group">
                         
                         <a href="/Admin/Task/CreateTask?companyId=${id}&id=${row.id}"
-                        class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i>Assign New Task</a>
-                        
+                        class="btn btn-primary mx-2"></i>New Task</a>
+                        <a href="/Admin/Task/Activity?id=${data}"
+                        class="btn btn-primary mx-2"></i>Activity</a>
+
                         </div>
                             `
                     } else {
                         return ``
                     }
                 },
-                "width": "20%"
+                "width": "25%"
             },
             {
                 "data": "id",
                 "render": function (data) {
 
                     return `
-                        <div class="w-75 btn-group" role="group">
+                        <div class="w-100 btn-group" role="group">
                         <a href="/Admin/Manage/UpdateEmployee?id=${data}"
                         class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i> Edit</a>
                         <a onClick=Delete('/Admin/Manage/Delete?userId=${data}&id=${id}')
@@ -66,7 +68,7 @@ function loadDataTable(role) {
                             `
 
                 },
-                "width": "30%"
+                "width": "25%"
             }
         ]
     })

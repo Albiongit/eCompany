@@ -1,0 +1,86 @@
+﻿@using eCompany.Models.DTOs.Entities
+@model ApplicationUserDTO
+@{
+    var status = Context.Request.Query["status"];
+
+    var All = "text-primary";
+    var New = "text primary";
+	var Active = "text primary";
+	var Problem = "text primary";
+	var Done = "text primary";
+	var Rejected = "text primary";
+
+	switch (status)
+	{
+		case "New" :
+			New = "active text-white";
+			break;
+		case "Active" :
+			Active = "active text-white";
+			break;
+        case "Problem" :
+			Problem = "active text-white";
+			break;
+        case "Done" :
+			Done = "active text-white";
+			break;
+        case "Rejected" :
+			Rejected = "active text-white";
+			break;
+		default :
+			All = "active text-white";
+			break;
+
+	}
+}
+
+<h1 style="text-align:center;">Task Activity - @Model.CompanyName Company</h1>
+<hr />
+<div class="row justify-content-between">
+	<div class="col-md-12 border" style="display:block">
+        <h3 style="text-align:center;">@Model.Name's Tasks</h3>
+        <div class="row p-2">
+            <ul class="list-group list-group-horizontal-sm">
+                <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Activity" asp-route-id="@Model.Id" >
+                    <li class="list-group-item @All" >All</li>
+                </a>
+                <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Activity" asp-route-id="@Model.Id" asp-route-status="New">
+                    <li class="list-group-item @New" >New</li>
+                </a>
+                <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Activity" asp-route-id="@Model.Id" asp-route-status="Active">
+                    <li class="list-group-item @Active" >Active</li>
+                </a>
+                <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Activity" asp-route-id="@Model.Id" asp-route-status="Problem">
+                    <li class="list-group-item @Problem" >Problem</li>
+                </a>
+                <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Activity" asp-route-id="@Model.Id" asp-route-status="Done">
+                    <li class="list-group-item @Done" >Done</li>
+                </a>
+                <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Activity" asp-route-id="@Model.Id" asp-route-status="Rejected">
+                    <li class="list-group-item @Rejected" >Rejected</li>
+                </a>
+            </ul>
+            <hr />
+        </div>
+        <div class="row pt-4">
+            <table id="tblData" data-id="@Model.Id" class="table table-bordered table-striped" style="width:100%">
+		    <thead>
+			    <tr>
+				    <th>Task ID</th>
+				    <th>Title</th>
+                    <th>Employee</th>
+				    <th>Status</th>
+				    <th>Details</th>
+			    </tr>
+		    </thead>
+	        </table>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/taskActivity.js"></script>
+}
