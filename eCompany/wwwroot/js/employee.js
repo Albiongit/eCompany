@@ -40,9 +40,9 @@ function loadDataTable(role) {
                         <div class="w-100 btn-group" role="group">
                         
                         <a href="/Admin/Task/CreateTask?companyId=${id}&id=${row.id}"
-                        class="btn btn-primary mx-2"></i>Assign Task</a>
+                        class="btn btn-primary mx-2" style="border-radius:5px;"></i>Assign Task</a>
                         <a href="/Admin/Task/Activity?id=${data}"
-                        class="btn btn-primary mx-2"></i>Activity</a>
+                        class="btn btn-primary mx-2" style="border-radius:5px;"></i>Activity</a>
 
                         </div>
                             `

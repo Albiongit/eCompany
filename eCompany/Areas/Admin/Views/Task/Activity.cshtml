@@ -1,4 +1,6 @@
 ﻿@using eCompany.Models.DTOs.Entities
+@using eCompany.Shared
+@inject IJsonHelper Json;
 @model ApplicationUserDTO
 @{
     var status = Context.Request.Query["status"];
@@ -38,7 +40,8 @@
 <hr />
 <div class="row justify-content-between">
 	<div class="col-md-12 border" style="display:block">
-        <h3 style="text-align:center;">@Model.Name's Tasks</h3>
+        <h3 style="text-align:center;" class="p-2">@Model.Name's Tasks</h3>
+        <div id="EmployeeId" hidden>@Model.Id</div>
         <div class="row p-2">
             <ul class="list-group list-group-horizontal-sm">
                 <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Activity" asp-route-id="@Model.Id" >
@@ -50,15 +53,16 @@
                 <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Activity" asp-route-id="@Model.Id" asp-route-status="Active">
                     <li class="list-group-item @Active" >Active</li>
                 </a>
-                <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Activity" asp-route-id="@Model.Id" asp-route-status="Problem">
-                    <li class="list-group-item @Problem" >Problem</li>
-                </a>
                 <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Activity" asp-route-id="@Model.Id" asp-route-status="Done">
                     <li class="list-group-item @Done" >Done</li>
+                </a>
+                <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Activity" asp-route-id="@Model.Id" asp-route-status="Problem">
+                    <li class="list-group-item @Problem" >Problem</li>
                 </a>
                 <a class="p-1" style="text-decoration:none" asp-controller="Task" asp-action="Activity" asp-route-id="@Model.Id" asp-route-status="Rejected">
                     <li class="list-group-item @Rejected" >Rejected</li>
                 </a>
+
             </ul>
             <hr />
         </div>
@@ -76,11 +80,39 @@
 	        </table>
         </div>
     </div>
+    <br />
+    <div class="col-md-12 border mt-2" style="display:block">
+        <h3 style="text-align:center;" class="p-2">Task Chart</h3>
+        <div class="row p-2 pb-3 flex-container">
+            <div  style="width:48%; height:400px; border:1px solid #ddd; padding:5px; border-radius:4px;">
+                <canvas id="vbar_chart"></canvas>
+            </div>
+            <div  style="width:48%; height:400px; border:1px solid #ddd; padding:5px; border-radius:4px; margin-left:10px;">
+                <canvas id="hbar_chart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-5 p-2" style="display:block">
+        @if (User.IsInRole(SD.Role_Admin))
+        {
+            <a asp-area="Admin" asp-controller="Employee" asp-action="Index"  type="button" class="btn btn-primary btn-lg btn-block">Back to list</a>
+        }else
+        {
+            <a asp-area="Admin" asp-controller="Manage" asp-action="GetEmployees" asp-route-id="@Model.CompanyId" type="button" class="btn btn-primary btn-lg btn-block">Back to list</a>
+        }
+        
+    
+    </div>
+     
 </div>
 
 
-
 @section Scripts{
+
+
     <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
     <script src="~/js/taskActivity.js"></script>
+     <script src="~/js/Common.js"></script>
+     <script src="~/js/chart.js"></script>
+     <script src="~/js/chart2.js"></script>
 }

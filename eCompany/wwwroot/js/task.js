@@ -47,16 +47,16 @@ function loadDataTable(status) {
             { "data": "taskId", "name": "TaskId", "width": "10%" },
             { "data": "title", "name": "Title", "width": "25%" },
             { "data": "employeeName", "name": "EmployeeName", "width": "25%" },
-            { "data": "status", "name": "Status", "width": "15%" },
+            { "data": "statusInfo", "name": "Status", "width": "15%"},
             {
                 "data": "taskId",
                 "render": function (data, data2, row) {
                     return `
-                        <div class="w-75 btn-group" role="group">
+                        <div class="w-100 btn-group" role="group">
                         <a href="/Admin/Task/Details?taskId=${data}"
-                        class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i> Details</a>
+                        class="btn btn-primary mx-2" style="border-radius:5px;"> <i class="bi bi-pencil-square"></i> Details</a>
                         <a onClick=Delete('/Admin/Task/Delete?taskId=${data}&id=${row.employeeId}')
-                        class="btn btn-danger mx-2"> <i class="bi bi-trash-fill"></i> Delete</a>
+                        class="btn btn-danger mx-2" style="border-radius:5px;"> <i class="bi bi-trash-fill"></i> Delete</a>
                         </div>
                             `
                 },

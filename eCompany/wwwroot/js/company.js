@@ -23,11 +23,11 @@ function loadDataTable() {
                 "data": "companyId",
                 "render": function (data) {
                     return `
-                        <div class="w-75 btn-group" role="group">
+                        <div class="w-100 btn-group" role="group">
                         <a href="/Admin/Manage/Index?id=${data}"
-                        class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i> Manage</a>
+                        class="btn btn-primary mx-2" style="border-radius:5px;"> <i class="bi bi-pencil-square"></i> Manage</a>
                         <a onClick=Delete('/Admin/Company/Delete/${data}')
-                        class="btn btn-danger mx-2"> <i class="bi bi-trash-fill"></i> Delete</a>
+                        class="btn btn-danger mx-2" style="border-radius:5px;"> <i class="bi bi-trash-fill"></i> Delete</a>
                         </div>
                             `
                 },

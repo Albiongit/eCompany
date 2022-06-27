@@ -40,14 +40,14 @@ function loadDataTable(status) {
             { "data": "title", "name": "Title", "width": "20%" },
             { "data": "employeeName", "name": "EmployeeName", "width": "20%" },
             { "data": "dueDateTask", "name": "DueDateTask", "width": "15%" },
-            { "data": "status", "name": "Status", "width": "15%" },
+            { "data": "statusInfo", "name": "Status", "width": "15%" },
             {
                 "data": "taskId",
                 "render": function (data) {
                     return `
-                        <div class="w-75 btn-group" role="group">
+                        <div class="w-100 btn-group" role="group">
                         <a href="/Customer/Task/Details?taskId=${data}"
-                        class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i> Open Task</a>
+                        class="btn btn-primary mx-2" style="border-radius:5px;"> <i class="bi bi-pencil-square"></i> Open Task</a>
                         </div>
                             `
                 },

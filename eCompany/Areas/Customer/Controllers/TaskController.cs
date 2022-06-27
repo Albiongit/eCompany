@@ -136,6 +136,27 @@ namespace eCompany.Areas.Customer.Controllers
 
         #region APICALLS
 
+        [HttpGet]
+        [Authorize(Roles = SD.Role_Employee)]
+        public async Task<JsonResult> GetNewTasks()
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+            var newTasks = await _unitOfWork.Tasks.GetEmployeeTasks(claim.Value, Status.New);
+
+            if (newTasks != null)
+            {
+                return Json(newTasks);
+            }
+            else
+            {
+                return Json(null);
+            }
+        }
+
+
+
         [HttpPost]
         public async Task<JsonResult> GetTaskList(string id, Status? status)
         {

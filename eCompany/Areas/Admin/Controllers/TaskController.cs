@@ -259,7 +259,9 @@ namespace eCompany.Areas.Admin.Controllers
         [Authorize(Roles = SD.Role_Admin + "," + SD.Role_SuperAdmin)]
         public async Task<ActionResult> Activity(string id)
         {
+            
             var employee = await _unitOfWork.CompanyUsers.GetUserProfile(id);
+
 
             if(employee != null)
             {
@@ -268,6 +270,71 @@ namespace eCompany.Areas.Admin.Controllers
 
             return View();
         }
+
+        [HttpGet]
+        public async Task<JsonResult> GetTasksChart(string id)
+        {
+            var employeeTasks = await _unitOfWork.Tasks.GetEmployeeTasks(id, null);
+            var stats = employeeTasks.Select(x => x.Status).Distinct();
+
+            string[] statsName = new string[] { "New", "Active", "Done", "Problem", "Rejected" };
+            Chart _chart = new Chart();
+            _chart.labels = statsName.ToArray();
+            _chart.datasets = new List<Datasets>();
+
+
+
+            for (int i = 0; i < 5; i++)
+            {
+                int j = i * 40;
+                int red = 50 + j;
+                int green = 50 + j;
+                int blue = 10 + j;
+                _chart.datasets.Add(new Datasets()
+                {
+                    label = _chart.labels[i],
+                    data = employeeTasks.Count(x => x.Status == (Status)i),
+                    backgroundColor = "rgba("+red+","+green+","+blue+",.5)",
+                    borderColor = "rgb(" + red + "," + green + "," + blue + ")",
+                    borderWidth = 1
+                });
+            }
+
+            return Json(_chart);
+        }
+
+
+        [HttpGet]
+        public async Task<JsonResult> GetMonthlyTasks(string id)
+        {
+            var employeeTasks = await _unitOfWork.Tasks.GetEmployeeMonthlyTasks(id);
+
+            string[] statsName = new string[] { "New", "Active", "Done", "Problem", "Rejected" };
+            Chart _chart = new Chart();
+            _chart.labels = statsName.ToArray();
+            _chart.datasets = new List<Datasets>();
+
+
+
+            for (int i = 0; i < 5; i++)
+            {
+                int j = i * 40;
+                int red = 50 + j;
+                int green = 10 + j;
+                int blue = 50 + j;
+                _chart.datasets.Add(new Datasets()
+                {
+                    label = _chart.labels[i],
+                    data = employeeTasks.Count(x => x.Status == (Status)i),
+                    backgroundColor = "rgba(" + red + "," + green + "," + blue + ",.5)",
+                    borderColor = "rgb(" + red + "," + green + "," + blue + ")",
+                    borderWidth = 1
+                });
+            }
+
+            return Json(_chart);
+        }
+
 
 
 
@@ -320,6 +387,7 @@ namespace eCompany.Areas.Admin.Controllers
             return Json(returnObj);
         }
 
+        
 
         [HttpPost]
         public async Task<JsonResult> GetUserTasks(string id, Status? status)

@@ -45,7 +45,8 @@ namespace eCompany.DataAccess.Repository
                                        AssignedDate = t.AssignedDate,
                                        FinishedDate = t.FinishedDate,
                                        EmployeeName = aU.Name,
-                                       Status = t.Status
+                                       Status = t.Status,
+                                       StatusInfo = t.Status.ToString()
                                    }).AsQueryable();
 
                 return taskDetails;
@@ -72,7 +73,8 @@ namespace eCompany.DataAccess.Repository
                                        AssignedDate = t.AssignedDate,
                                        FinishedDate = t.FinishedDate,
                                        EmployeeName = aU.Name,
-                                       Status = t.Status
+                                       Status = t.Status,
+                                       StatusInfo = t.Status.ToString()
                                    }).AsQueryable();
 
                 return taskDetails;
@@ -139,7 +141,7 @@ namespace eCompany.DataAccess.Repository
                                        DueDateTask = t.AssignedDate.AddDays(t.DayDuration).ToString("MMMM dd, yyyy"),
                                        EmployeeName = aU.Name,
                                        Status = t.Status,
-                                       /*StatusInfo = Enum.GetName(typeof(Status), 2) */    // TO DO
+                                       StatusInfo = t.Status.ToString()
                                    }).AsQueryable();
 
                 return taskDetails;
@@ -170,11 +172,45 @@ namespace eCompany.DataAccess.Repository
                                        DueDateTask = t.AssignedDate.AddDays(t.DayDuration).ToString("MMMM dd, yyyy"),
                                        EmployeeName = aU.Name,
                                        Status = t.Status,
-                                       /*StatusInfo =  Enum.GetName(typeof(Status), Status.Done)   */   // TO DO
+                                       StatusInfo = t.Status.ToString()
                                    }).AsQueryable();
 
                 return taskDetails;
             }
+
+
+        }
+
+        public async Task<IQueryable<TaskEntityDTO>> GetEmployeeMonthlyTasks(string id)
+        {
+
+                var taskDetails = (from t in _db.Tasks
+                                   join c in _db.Companies on t.CompanyID equals c.CompanyId
+                                   join aU in _db.ApplicationUsers on t.EmployeeId equals aU.Id
+                                   where aU.Id == id
+                                   where t.AssignedDate >= DateTime.Now.AddDays(-30)
+                                   select new TaskEntityDTO
+                                   {
+                                       CompanyId = c.CompanyId,
+                                       CompanyName = c.CompanyName,
+                                       CompanyPhone = c.CompanyPhone,
+                                       CompanyState = c.CompanyState,
+                                       CompanyWeb = c.CompanyWeb,
+                                       TaskId = t.TaskId,
+                                       Title = t.Title,
+                                       EmployeeId = t.EmployeeId,
+                                       DayDuration = t.DayDuration,
+                                       Description = t.Description,
+                                       AssignedDate = t.AssignedDate,
+                                       FinishedDate = t.FinishedDate,
+                                       DueDate = t.AssignedDate.AddDays(t.DayDuration),
+                                       DueDateTask = t.AssignedDate.AddDays(t.DayDuration).ToString("MMMM dd, yyyy"),
+                                       EmployeeName = aU.Name,
+                                       Status = t.Status,
+                                       StatusInfo = t.Status.ToString()
+                                   }).AsQueryable();
+
+                return taskDetails;
 
 
         }

@@ -14,6 +14,15 @@
         "dist/browser/signalr.js",
         "dist/browser/signalr.min.js"
       ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "chart.js@3.8.0",
+      "destination": "wwwroot/chart.js/",
+      "files": [
+        "dist/chart.js",
+        "dist/chart.min.js"
+      ]
     }
   ]
 }

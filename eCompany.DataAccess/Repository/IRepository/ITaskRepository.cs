@@ -12,6 +12,7 @@ namespace eCompany.DataAccess.Repository.IRepository
     {
         public Task<IQueryable<TaskEntityDTO>> GetAllTasks(int id, Status? status);
         public Task<IQueryable<TaskEntityDTO>> GetEmployeeTasks(string id, Status? status);
+        public Task<IQueryable<TaskEntityDTO>> GetEmployeeMonthlyTasks(string id);
         public Task<TaskEntityDTO> GetTaskDetails(int taskId);
         void Update(TaskEntity task);
 
