@@ -1,4 +1,5 @@
-﻿using eCompany.DataAccess.Data;
+﻿using AutoMapper;
+using eCompany.DataAccess.Data;
 using eCompany.DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -14,14 +15,17 @@ namespace eCompany.DataAccess.Repository
         private ApplicationDbContext _db;
         private UserManager<IdentityUser> _userManager;
         private RoleManager<IdentityRole> _roleManager;
+        private readonly IMapper _mapper;
 
         public UnitOfWork(ApplicationDbContext db, 
                           RoleManager<IdentityRole> roleManager,
-                          UserManager<IdentityUser> userManager)
+                          UserManager<IdentityUser> userManager,
+                          IMapper mapper)
         {
             _db = db;
             _userManager = userManager;
             _roleManager = roleManager;
+            _mapper = mapper;
             Company = new CompanyRepository(_db);
             ApplicationUser = new ApplicationUserRepository(_db);
             CompanyUsers = new CompanyUsersRepository(_db, _roleManager, _userManager);

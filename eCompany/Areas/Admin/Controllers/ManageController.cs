@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Linq.Dynamic.Core;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
 
 namespace eCompany.Areas.Admin.Controllers
 {
@@ -21,18 +22,21 @@ namespace eCompany.Areas.Admin.Controllers
         private readonly ApplicationDbContext _db;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IWebHostEnvironment _hostEnvironment;
+        private readonly IMapper _mapper;
 
         public ManageController(IUnitOfWork unitOfWork,
                                 ApplicationDbContext db,
                                 UserManager<IdentityUser> userManager,
                                 RoleManager<IdentityRole> roleManager,
-                                IWebHostEnvironment hostEnvironment)
+                                IWebHostEnvironment hostEnvironment,
+                                IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _db = db;
             _userManager = userManager;
             _roleManager = roleManager;
             _hostEnvironment = hostEnvironment;
+            _mapper = mapper;
         }
 
 
@@ -133,38 +137,19 @@ namespace eCompany.Areas.Admin.Controllers
             var employee = await _unitOfWork.ApplicationUser.GetFirstOrDefaultAsync(u => u.Id == id);
             var userRoles = await _userManager.GetRolesAsync(employee);
 
-            var userName = await _userManager.GetUserNameAsync(employee);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(employee);
 
+            var userFromDb_eg = await _unitOfWork.CompanyUsers.GetUserProfile(employee.Id);
+            var userProfileModel = _mapper.Map<ApplicationUserDTO>(userFromDb_eg);
 
-
-            var userFromDb = await _unitOfWork.CompanyUsers.GetUserProfile(employee.Id);
-            userFromDb.Role = userRoles[0];
-
-
-
-            ApplicationUserDTO userEmployee = new ApplicationUserDTO
+            userProfileModel.Role = userRoles[0];
+            userProfileModel.RoleList = _roleManager.Roles.Where(r => r.Name != SD.Role_SuperAdmin).Select(x => x.Name).Select(i => new SelectListItem
             {
-                Id = id,
-                Name = userFromDb.Name,
-                City = userFromDb.City,
-                State = userFromDb.State,
-                Email = userName,
-                ImageUrl = userFromDb.ImageUrl,
-                Sex = userFromDb.Sex,
-                PhoneNumber = phoneNumber,
-                Role = userFromDb.Role,
-                CompanyName = userFromDb.CompanyName,
-                CompanyId = userFromDb.CompanyId,
-                RoleList = _roleManager.Roles.Where(r => r.Name != SD.Role_SuperAdmin).Select(x => x.Name).Select(i => new SelectListItem
-                {
-                    Text = i,
-                    Value = i
-                })
+                Text = i,
+                Value = i
+            });
 
-            };
 
-            return View(userEmployee);
+            return View(userProfileModel);
         }
 
 

@@ -10,6 +10,7 @@ using eCompany.Shared;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.SignalR.Client;
+using AutoMapper;
 
 namespace eCompany.Areas.Admin.Controllers
 {
@@ -19,14 +20,16 @@ namespace eCompany.Areas.Admin.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly ApplicationDbContext _db;
         private readonly IEmailSender _emailSender;
+        private readonly IMapper _mapper;
 
         private string errorMessage = "";
 
-        public TaskController(IUnitOfWork unitOfWork, ApplicationDbContext db, IEmailSender emailSender)
+        public TaskController(IUnitOfWork unitOfWork, ApplicationDbContext db, IEmailSender emailSender, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _db = db;
             _emailSender = emailSender;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -39,9 +42,12 @@ namespace eCompany.Areas.Admin.Controllers
 
 
             var companyFromDb = await _unitOfWork.CompanyUsers.GetCompanyDetails(claim.Value);
-            if ( companyFromDb != null)
+
+            var companyDetailsModel = _mapper.Map<CompanyDTO>(companyFromDb);
+
+            if (companyDetailsModel != null)
             {
-                return View(companyFromDb);
+                return View(companyDetailsModel);
             }
 
             return View();
@@ -59,11 +65,14 @@ namespace eCompany.Areas.Admin.Controllers
 
             // Super Admin check
             var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-            var companyAdmin = await _unitOfWork.CompanyUsers.GetUserProfile(claim.Value);
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier) ;
+
+
+            var companyAdmin = await _unitOfWork.CompanyUsers.GetFirstOrDefaultAsync(x => x.UserId == claim.Value);
+
             if (companyAdmin == null)
             {
-                //So its Super Admin
+                //Then it's Super Admin
                 taskEntityDTO.SuperAdminId = claim.Value;
             }
 
@@ -83,14 +92,15 @@ namespace eCompany.Areas.Admin.Controllers
                 var employee = await _unitOfWork.ApplicationUser.GetFirstOrDefaultAsync(u => u.Id == id);
                 taskEntityDTO.EmployeeName = employee.Name;
                 taskEntityDTO.EmployeeId = id;
-                
+
                 taskEntityDTO.EmployeeList = getEmployee.Select(x => new SelectListItem
                 {
                     Text = x.Name,
-                    Value = x.Id.ToString()
-                });
-
+                    Value = x.Id.ToString(),
                 
+            });
+
+
             }
 
             var company = await _unitOfWork.Company.GetFirstOrDefaultAsync(c => c.CompanyId == companyId);
@@ -100,6 +110,8 @@ namespace eCompany.Areas.Admin.Controllers
 
             return View(taskEntityDTO);
         }
+
+
 
 
         // Select for dropdown list of employees
@@ -132,7 +144,7 @@ namespace eCompany.Areas.Admin.Controllers
             // Super Admin check
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-            var companyAdmin = await _unitOfWork.CompanyUsers.GetUserProfile(claim.Value);
+            var companyAdmin = await _unitOfWork.CompanyUsers.GetUserProfile(claim?.Value);
             
 
             if (ModelState.IsValid)
@@ -154,12 +166,9 @@ namespace eCompany.Areas.Admin.Controllers
 
                 _unitOfWork.Save();
 
-                //HubConnection connection = new HubConnectionBuilder().WithUrl("https://localhost:44384//taskHub").Build();
-                ////await connection.StartAsync();
-                //await connection.InvokeAsync("UpdateTaskTable", taskEntityDTO.EmployeeId);
-                //await connection.DisposeAsync();
+              
 
-                var selectedEmployee = await _unitOfWork.CompanyUsers.GetUserProfile(taskEntityDTO.EmployeeId);
+                var selectedEmployee = await _unitOfWork.ApplicationUser.GetFirstOrDefaultAsync(x => x.Id == taskEntityDTO.EmployeeId);
                 string employeeEmail = selectedEmployee.Email;
 
                 // send email for task confirmation
@@ -168,14 +177,16 @@ namespace eCompany.Areas.Admin.Controllers
 
                 if (companyAdmin != null)
                 {
+                    var adminModel = _mapper.Map<ApplicationUserDTO>(companyAdmin);
+
                     await _emailSender.SendEmailAsync(employeeEmail, "New Task - " + taskEntityDTO.CompanyName, "<p>New task assigned \" " + taskEntityDTO.Title + " \" for you, visit the webpage for the task details.</br>" +
-                                                                                                         "Task assigned from " + companyAdmin.Name + " - " + companyAdmin.CompanyName + " Company.</p>");
+                                                                                                         "Task assigned from " + adminModel.Name + " - "   + adminModel.CompanyName + " Company.</p>");
                     return RedirectToAction("Index", "Task");
                 }
 
                 // Otherwise if its Super Admin then
                 await _emailSender.SendEmailAsync(employeeEmail, "New Task - " + taskEntityDTO.CompanyName, "<p>New task assigned \" " + taskEntityDTO.Title + " \" for you, visit the webpage for the task details.</br>" +
-                                                                                                         "Task assigned from Super Admin - " + selectedEmployee.CompanyName + " Company.</p>");
+                                                                                                         "Task assigned from Super Admin - " /* + selectedEmployee.CompanyName*/ /*+ " Company.</p>"*/);
                 return RedirectToAction("GetTasks", "Manage", new { companyId = taskEntityDTO.CompanyId });
 
             }
@@ -192,12 +203,13 @@ namespace eCompany.Areas.Admin.Controllers
 
             // Super Admin check
             var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-            var companyAdmin = await _unitOfWork.CompanyUsers.GetUserProfile(claim.Value);
+            var claim = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier);
+            var companyAdmin = await _unitOfWork.CompanyUsers.GetFirstOrDefaultAsync(x => x.UserId == claim.Value);
+
             if(companyAdmin == null)
             {
                 //So its Super Admin
-                taskEntity.SuperAdminId = claim.Value;
+                taskEntity.SuperAdminId = claim?.Value;
             }
 
             taskEntity.StatusList = new SelectList(Enum.GetNames(typeof(Status)));
@@ -262,10 +274,11 @@ namespace eCompany.Areas.Admin.Controllers
             
             var employee = await _unitOfWork.CompanyUsers.GetUserProfile(id);
 
+            var employeeModel = _mapper.Map<ApplicationUserDTO>(employee);
 
-            if(employee != null)
+            if(employeeModel != null)
             {
-                return View(employee);
+                return View(employeeModel);
             }
 
             return View();

@@ -1,4 +1,5 @@
-﻿using eCompany.DataAccess.Data;
+﻿using AutoMapper;
+using eCompany.DataAccess.Data;
 using eCompany.DataAccess.Repository.IRepository;
 using eCompany.Models;
 using eCompany.Models.DTOs.Entities;
@@ -191,7 +192,7 @@ namespace eCompany.DataAccess.Repository
                                    where t.AssignedDate >= DateTime.Now.AddDays(-30)
                                    select new TaskEntityDTO
                                    {
-                                       CompanyId = c.CompanyId,
+                                       CompanyId = t.Company.CompanyId,
                                        CompanyName = c.CompanyName,
                                        CompanyPhone = c.CompanyPhone,
                                        CompanyState = c.CompanyState,

@@ -6,6 +6,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using AutoMapper;
 using eCompany.DataAccess.Data;
 using eCompany.DataAccess.Repository.IRepository;
 using eCompany.Models.DTOs.Entities;
@@ -22,19 +23,22 @@ namespace eCompany.Areas.Identity.Pages.Account.Manage
         private readonly IUnitOfWork _unitOfWork;
         private readonly ApplicationDbContext _db;
         private readonly IWebHostEnvironment _hostEnvironment;
+        private readonly IMapper _mapper;
 
         public IndexModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             IUnitOfWork unitOfWork,
             ApplicationDbContext db,
-            IWebHostEnvironment hostEnvironment)
+            IWebHostEnvironment hostEnvironment,
+            IMapper mapper)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _unitOfWork = unitOfWork;
             _db = db;
             _hostEnvironment = hostEnvironment; 
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -123,19 +127,20 @@ namespace eCompany.Areas.Identity.Pages.Account.Manage
             else 
             {
                 var userFromDb = await _unitOfWork.CompanyUsers.GetUserProfile(user.Id);
-                userFromDb.Role = userRoles[0];
+                var userDbModel =  _mapper.Map<ApplicationUserDTO>(userFromDb);
+                userDbModel.Role = userRoles[0];
                 //string userRoli = userRoles[0];
 
-                Id = userFromDb.Id;
+                Id = userDbModel.Id;
                 Username = userName;
-                Name = userFromDb.Name;
-                Sex = userFromDb.Sex;
-                City = userFromDb.City;
-                State = userFromDb.State;
-                Role = userFromDb.Role;
-                CompanyName = userFromDb.CompanyName;
-                ImageUrl = userFromDb.ImageUrl;
-                PhoneNumber = userFromDb.PhoneNumber;
+                Name = userDbModel.Name;
+                Sex = userDbModel.Sex;
+                City = userDbModel.City;
+                State = userDbModel.State;
+                Role = userDbModel.Role;
+                CompanyName = userDbModel.CompanyName;
+                ImageUrl = userDbModel.ImageUrl;
+                PhoneNumber = userDbModel.PhoneNumber;
 
             }
 

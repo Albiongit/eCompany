@@ -2,7 +2,7 @@
 
 
 $(document).ready(function () {
-
+   
 var id = document.getElementById("EmployeeId").textContent;
 var c = document.getElementById("hbar_chart");
 var ctx = c.getContext("2d");
@@ -30,7 +30,7 @@ var myHBarChart = new Chart(ctx, {
         plugins: {
             title: {
                 display: true,
-                text: "Employee's Tasks - on current 30 days "
+                text: "Employee's Tasks - last 30 days "
             }
         },
         maintainAspectRatio: false,

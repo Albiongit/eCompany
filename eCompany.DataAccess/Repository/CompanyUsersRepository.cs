@@ -1,4 +1,5 @@
-﻿using eCompany.DataAccess.Data;
+﻿using AutoMapper;
+using eCompany.DataAccess.Data;
 using eCompany.DataAccess.Repository.IRepository;
 using eCompany.Models;
 using eCompany.Models.DTOs.Entities;
@@ -87,50 +88,16 @@ namespace eCompany.DataAccess.Repository
 
         }
 
-        public async Task<CompanyDTO> GetCompanyDetails(string id)
+        public async Task<Company> GetCompanyDetails(string id)
         {
             var companyDetails = await _db.Companies_Users
                     .Include(x => x.Company)
                     .Where(x => x.UserId == id)
-                    .Select(x => new CompanyDTO
-                    {
-                        CompanyId = x.Company.CompanyId,
-                        CompanyName = x.Company.CompanyName,
-                        CompanyPhone = x.Company.CompanyPhone,
-                        CompanyState = x.Company.CompanyState,
-                        CompanyWeb = x.Company.CompanyWeb
-                    }).FirstOrDefaultAsync();
+                    .Select(x => x.Company)
+                    .FirstOrDefaultAsync();
+
 
             return companyDetails;
-        }
-
-
-
-        public async Task<ApplicationUserDTO> GetUserProfile(string userId)
-        {
-            var userFromDb = await _db.Companies_Users
-                .Include(x => x.ApplicationUser)
-                .Include(x => x.Company)
-                .Where(x => x.UserId == userId)
-                .Select(x => new ApplicationUserDTO
-                {
-                    Id = x.ApplicationUser.Id,
-                    Name = x.ApplicationUser.Name,
-                    Sex = x.ApplicationUser.Sex,
-                    Email = x.ApplicationUser.Email,
-                    City = x.ApplicationUser.City,
-                    State = x.ApplicationUser.State,
-                    ImageUrl = x.ApplicationUser.ImageUrl,
-                    CompanyName = x.Company.CompanyName,
-                    CompanyId = x.Company.CompanyId,
-                    PhoneNumber = x.ApplicationUser.PhoneNumber
-                })
-                .FirstOrDefaultAsync();
-
-            
-
-
-            return userFromDb;
         }
 
 
@@ -160,6 +127,15 @@ namespace eCompany.DataAccess.Repository
             return userFromDb;
         }
 
+        public async Task<Company_User?> GetUserProfile(string id)
+        {
+            var userFromDb = await _db.Companies_Users
+                    .Include(x => x.ApplicationUser)
+                    .Include(x => x.Company)
+                    .Where(x => x.UserId == id)
+                    .FirstOrDefaultAsync();
 
+            return userFromDb;
+        }
     }
 }
