@@ -88,7 +88,7 @@ namespace eCompany.DataAccess.Repository
 
         }
 
-        public async Task<Company> GetCompanyDetails(string id)
+        public async Task<Company?> GetCompanyDetails(string id)
         {
             var companyDetails = await _db.Companies_Users
                     .Include(x => x.Company)
@@ -99,6 +99,9 @@ namespace eCompany.DataAccess.Repository
 
             return companyDetails;
         }
+
+
+        
 
 
         public async Task<IQueryable<ApplicationUserDTO>> GetUserDetails(string userId)

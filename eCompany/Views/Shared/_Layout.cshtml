@@ -34,35 +34,35 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="Customer" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-light" asp-area="Customer" asp-controller="Home" asp-action="Index">@sharedResource["Home"]</a>
                         </li>
                         @if(User.IsInRole(SD.Role_Admin))
                         {
                             <li class="nav-item dropdown">
                                     <a class="nav-link text-light dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        My Company
+                                        @sharedResource["MyCompany"]
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                        <a class="dropdown-item text-light" asp-area="Admin" asp-controller="Employee" asp-action="Index">Employees</a>
-                                        <a class="dropdown-item text-light" asp-area="Admin" asp-controller="Task" asp-action="Index">Tasks</a>
-                                        <a class="dropdown-item text-light" asp-area="" asp-controller="" asp-action="">Other</a>
-
+                                        <a class="dropdown-item text-light" asp-area="Admin" asp-controller="Company" asp-action="GetCompany">@sharedResource["Company"]</a>
+                                        <a class="dropdown-item text-light" asp-area="Admin" asp-controller="Employee" asp-action="Index">@sharedResource["Employees"]</a>
+                                        <a class="dropdown-item text-light" asp-area="Admin" asp-controller="Task" asp-action="Index">@sharedResource["Tasks"]</a>
+                                        <a class="dropdown-item text-light" asp-area="Customer" asp-controller="Language" asp-action="Change" asp-route-culture="en-US" >EN</a>
                                     </div>
                             </li>
                         }
                         @if(User.IsInRole(SD.Role_SuperAdmin))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-light" asp-area="Admin" asp-controller="Company" asp-action="Index">Companies</a>
+                                <a class="nav-link text-light" asp-area="Admin" asp-controller="Company" asp-action="Index">@sharedResource["Companies"]</a>
                             </li>
                             <li class="nav-item">
-                                <a id="register" class="nav-link text-light" asp-area="Identity" asp-page="/Account/Register" >Register new user</a>
+                                <a id="register" class="nav-link text-light" asp-area="Identity" asp-page="/Account/Register" >@sharedResource["RegisterNew"]</a>
                             </li>
                         }
                         @if (User.IsInRole(SD.Role_Employee))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-light" asp-area="Customer" asp-controller="Task" asp-action="Index">Tasks</a>
+                                <a class="nav-link text-light" asp-area="Customer" asp-controller="Task" asp-action="Index">@sharedResource["Tasks"]</a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link text-light dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
@@ -89,8 +89,21 @@
 
     <footer class="border-top footer text-muted bg-dark">
         <div class="container">
-            &copy; 2022 - eCompany - <a asp-area="Customer" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            
+            <div style="float:left">
+                &copy; 2022 - eCompany - <a asp-area="Customer" asp-controller="Home" asp-action="Privacy">@sharedResource["Privacy"]</a>
+            </div>
+            <div style="float:right" class="p-1 pt-0">
+                <a class="text-light" style="text-decoration:none" asp-area="Customer" asp-controller="Language" asp-action="Change" asp-route-culture="de-DE" >DE</a>
+            </div>
+            <div style="float:right" class="p-1 pt-0">
+                <a class="text-light" style="text-decoration:none" asp-area="Customer" asp-controller="Language" asp-action="Change" asp-route-culture="en-US" >EN</a>
+            </div>
+            <div style="float:right" class="p-1 pt-0">
+                Languages : 
+            </div>
         </div>
+        
     </footer>
     <script src="~/lib/jquery/dist/jquery.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

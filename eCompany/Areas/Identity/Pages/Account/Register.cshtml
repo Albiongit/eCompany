@@ -1,15 +1,18 @@
 ﻿@page 
+@using Microsoft.Extensions.Localization
+@using eCompany
+@inject IStringLocalizer<SharedResource> sharedResource
 @model RegisterModel
 @{
     ViewData["Title"] = "Register";
 }
 
-<h1 style="text-align:center" class="p-3">@ViewData["Title"] New User</h1>
+<h1 style="text-align:center" class="p-3">@sharedResource["RegisterNew"]</h1>
 
 <div class="row p-4 border m-auto col-8"  >
     <div class="col-md-12">
         <form id="registerForm" class="row" asp-route-returnUrl="@Model.ReturnUrl" asp-route-id="@Model.ReturnId" asp-route-errorText="@Model.ErrorText" method="post" enctype="multipart/form-data">
-            <h2>Create a new account.</h2>
+            <h2>@sharedResource["CreateAcc"]</h2>
             <div style="color:red;">@Model.ErrorText</div>
             <hr />
             <div id="CompanyId" hidden>@Model.ReturnId</div>
@@ -82,7 +85,7 @@
                 <label asp-for="Input.CompanyId" style="margin-left:5px;" ></label>
             </div>
             <br />
-            <button id="registerSubmit" type="submit" class="w-90 btn btn-primary p-3">Register</button>
+            <button id="registerSubmit" type="submit" class="w-90 btn btn-primary p-3">@sharedResource["Register"]</button>
         </form>
     </div>
 </div>

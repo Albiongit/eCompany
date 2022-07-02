@@ -1,4 +1,7 @@
 ﻿@page
+@using Microsoft.Extensions.Localization
+@using eCompany
+@inject IStringLocalizer<SharedResource> sharedResource
 @model LoginModel
 
 @{
@@ -7,7 +10,7 @@
 
         <div id="logreg-forms">
             <form id="account" method="post" class="form-signin">
-                <h2>Sign In</h2>
+                <h2>@sharedResource["SignIn"]</h2>
                 <hr />
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-outline mb-2">
@@ -30,17 +33,11 @@
                     </div>
                 </div>
                 <div>
-                    <button id="login-submit" type="submit"  class="w-100 btn btn-lg btn-primary">Log in</button>
+                    <button id="login-submit" type="submit"  class="w-100 btn btn-lg btn-primary">@sharedResource["Login"]</button>
                 </div>
                 <div>
                     <p>
-                        <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
+                        <a id="forgot-password" asp-page="./ForgotPassword">@sharedResource["ForgotPass"]</a>
                     </p>
                 </div>
             </form>

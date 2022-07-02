@@ -1,10 +1,12 @@
-﻿using eCompany.DataAccess.Repository.IRepository;
+﻿using AutoMapper;
+using eCompany.DataAccess.Repository.IRepository;
 using eCompany.Models;
 using eCompany.Models.DTOs.Entities;
 using eCompany.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Dynamic.Core;
+using System.Security.Claims;
 
 namespace eCompany.Areas.Admin.Controllers
 {
@@ -13,10 +15,12 @@ namespace eCompany.Areas.Admin.Controllers
     public class CompanyController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public CompanyController(IUnitOfWork unitOfWork)
+        public CompanyController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
        
 
@@ -61,6 +65,53 @@ namespace eCompany.Areas.Admin.Controllers
                 _unitOfWork.Save();
 
                 return RedirectToAction("Index", "Company");
+            }
+            return View(obj);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = SD.Role_Admin)]
+        public async Task<IActionResult> GetCompany()
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+            var companyDetails = await _unitOfWork.CompanyUsers.GetCompanyDetails(claim.Value);
+
+            var companyDetailsModel = _mapper.Map<CompanyDTO>(companyDetails);
+
+
+            if (companyDetailsModel != null)
+            {
+                return View(companyDetailsModel);
+            }
+
+            return View();
+        }
+
+        //POST - Update
+        [HttpPost]
+        [Authorize(Roles = SD.Role_Admin)]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateCompany(CompanyDTO obj)
+        {
+            if (ModelState.IsValid)
+            {
+                var companyEntity = new Company
+                {
+                    CompanyId = obj.CompanyId,
+                    CompanyName = obj.CompanyName,
+                    CompanyPhone = obj.CompanyPhone,
+                    CompanyState = obj.CompanyState,
+                    CompanyWeb = obj.CompanyWeb
+                };
+
+                _unitOfWork.Company.Update(companyEntity);
+                TempData["success"] = "Company updated successfully!";
+
+                _unitOfWork.Save();
+
+                return RedirectToAction("GetCompany", "Company");
             }
             return View(obj);
         }
