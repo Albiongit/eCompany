@@ -7,22 +7,27 @@ $(document).ready(function () {
 function loadDataTable() {
     dataTable = $('#tblData').DataTable({
         "ajax": {
-            "url":"/Admin/Company/GetAll"
+            "url": "/Admin/Company/GetCompanyList",
+            "type": "POST"
         },
+        "stateSave": "true",
+        "proccesing": "true",
+        "serverSide": "true",
+        "filter": "true",
         "columns": [
-            {"data": "companyName", "width": "20%"},
-            {"data": "companyPhone", "width": "20%"},
-            {"data": "companyState", "width": "20%"},
-            {"data": "companyWeb", "width": "20%" },
+            {"data": "companyName", "name": "CompanyName", "width": "20%"},
+            {"data": "companyPhone", "name": "CompanyPhone", "width": "20%"},
+            {"data": "companyState", "name": "CompanyState", "width": "20%"},
+            {"data": "companyWeb", "name": "CompanyWeb", "width": "20%" },
             {
                 "data": "companyId",
                 "render": function (data) {
                     return `
-                        <div class="w-75 btn-group" role="group">
+                        <div class="w-100 btn-group" role="group">
                         <a href="/Admin/Manage/Index?id=${data}"
-                        class="btn btn-primary mx-2"> <i class="bi bi-pencil-square"></i> Manage</a>
+                        class="btn btn-primary mx-2" style="border-radius:5px;"> <i class="bi bi-pencil-square"></i> Manage</a>
                         <a onClick=Delete('/Admin/Company/Delete/${data}')
-                        class="btn btn-danger mx-2"> <i class="bi bi-trash-fill"></i> Delete</a>
+                        class="btn btn-danger mx-2" style="border-radius:5px;"> <i class="bi bi-trash-fill"></i> Delete</a>
                         </div>
                             `
                 },
@@ -56,6 +61,26 @@ function Delete(url) {
                     }
                 }
             })
+            redrawAfterDelete($('#tblData').DataTable());
         }
     })
+};
+
+
+
+function redrawAfterDelete(tableToRedraw) {
+    var info = tableToRedraw.page.info();
+
+    if (info.page > 0) {
+        // when we are in the second page or above
+        if (info.recordsTotal - 1 > info.page * info.length) {
+            // after removing 1 from the total, there are still more elements
+            // than the previous page capacity 
+            location.reload(null, false);
+        } else {
+            // there are less elements, so we navigate to the previous page
+            tableToRedraw.page('previous').draw('page');
+            /*location.reload(null, false);*/
+        }
+    }
 }

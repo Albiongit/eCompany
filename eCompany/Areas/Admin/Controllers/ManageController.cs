@@ -6,11 +6,15 @@ using eCompany.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Linq.Dynamic.Core;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
 
 namespace eCompany.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_SuperAdmin)]
     public class ManageController : Controller
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -18,18 +22,21 @@ namespace eCompany.Areas.Admin.Controllers
         private readonly ApplicationDbContext _db;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IWebHostEnvironment _hostEnvironment;
+        private readonly IMapper _mapper;
 
         public ManageController(IUnitOfWork unitOfWork,
                                 ApplicationDbContext db,
                                 UserManager<IdentityUser> userManager,
                                 RoleManager<IdentityRole> roleManager,
-                                IWebHostEnvironment hostEnvironment)
+                                IWebHostEnvironment hostEnvironment,
+                                IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _db = db;
             _userManager = userManager;
             _roleManager = roleManager;
             _hostEnvironment = hostEnvironment;
+            _mapper = mapper;
         }
 
 
@@ -73,7 +80,8 @@ namespace eCompany.Areas.Admin.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetEmployees(int? id)
+        [Authorize(Roles = SD.Role_SuperAdmin)]
+        public async Task<IActionResult> GetEmployees(int? id, string? status)
         {
             var company = await _unitOfWork.Company.GetFirstOrDefaultAsync(uc => uc.CompanyId == id);
             CompanyDTO companyDTO = new CompanyDTO
@@ -93,6 +101,7 @@ namespace eCompany.Areas.Admin.Controllers
         //POST - Update Company
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = SD.Role_SuperAdmin)]
         public async Task<IActionResult> Update(CompanyDTO obj)
         {
             if (ModelState.IsValid)
@@ -120,53 +129,37 @@ namespace eCompany.Areas.Admin.Controllers
 
 
         //GET  - Update Employee
+        [HttpGet]
+        [Authorize(Roles = SD.Role_SuperAdmin)]
         public async Task<IActionResult> UpdateEmployee(string id)
         {
 
             var employee = await _unitOfWork.ApplicationUser.GetFirstOrDefaultAsync(u => u.Id == id);
             var userRoles = await _userManager.GetRolesAsync(employee);
 
-            var userName = await _userManager.GetUserNameAsync(employee);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(employee);
 
+            var userFromDb_eg = await _unitOfWork.CompanyUsers.GetUserProfile(employee.Id);
+            var userProfileModel = _mapper.Map<ApplicationUserDTO>(userFromDb_eg);
 
-
-            var userFromDb = await _unitOfWork.CompanyUsers.GetUserProfile(employee.Id);
-            userFromDb.Role = userRoles[0];
-
-
-
-            ApplicationUserDTO userEmployee = new ApplicationUserDTO
+            userProfileModel.Role = userRoles[0];
+            userProfileModel.RoleList = _roleManager.Roles.Where(r => r.Name != SD.Role_SuperAdmin).Select(x => x.Name).Select(i => new SelectListItem
             {
-                Id = id,
-                Name = userFromDb.Name,
-                City = userFromDb.City,
-                State = userFromDb.State,
-                Email = userName,
-                ImageUrl = userFromDb.ImageUrl,
-                Sex = userFromDb.Sex,
-                PhoneNumber = phoneNumber,
-                Role = userFromDb.Role,
-                CompanyName = userFromDb.CompanyName,
-                CompanyId = userFromDb.CompanyId,
-                RoleList = _roleManager.Roles.Where(r => r.Name != SD.Role_SuperAdmin).Select(x => x.Name).Select(i => new SelectListItem
-                {
-                    Text = i,
-                    Value = i
-                })
+                Text = i,
+                Value = i
+            });
 
-            };
 
-            return View(userEmployee);
+            return View(userProfileModel);
         }
 
 
         //POST  -  Update Employee
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = SD.Role_SuperAdmin)]
         public async Task<IActionResult> UpdateEmployee(ApplicationUserDTO applicationUser, IFormFile? file = null)
         {
-            String StatusMessage = "Nothing in the profile has changed";
+            var StatusMessage = "Nothing in the profile has changed";
 
             var userFromDb = _db.ApplicationUsers.FirstOrDefault(u => u.Id == applicationUser.Id);
             if (userFromDb == null)
@@ -174,9 +167,9 @@ namespace eCompany.Areas.Admin.Controllers
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
             {
-                return RedirectToAction("UpdateEmployee", applicationUser.Id);
+                return RedirectToAction("UpdateEmployee", new { id = applicationUser.Id });
             }
 
 
@@ -296,6 +289,29 @@ namespace eCompany.Areas.Admin.Controllers
 
 
 
+        [HttpGet]
+        [Authorize(Roles = SD.Role_SuperAdmin)]
+        public async Task<ActionResult> GetTasks(int companyId)
+        {
+            var companyDetails = await _unitOfWork.Company.GetFirstOrDefaultAsync(c => c.CompanyId == companyId);
+            if (companyDetails != null)
+            {
+                CompanyDTO company = new CompanyDTO
+                {
+                    CompanyId = companyDetails.CompanyId,
+                    CompanyName = companyDetails.CompanyName,
+                    CompanyPhone = companyDetails.CompanyPhone,
+                    CompanyState = companyDetails.CompanyState,
+                    CompanyWeb = companyDetails.CompanyWeb
+                };
+                return View(company);
+            }
+
+            return View();
+        }
+
+
+
 
 
 
@@ -303,19 +319,78 @@ namespace eCompany.Areas.Admin.Controllers
         #region API CALLS
 
         [HttpGet]
+        [Authorize(Roles = SD.Role_SuperAdmin)]
         public async Task<IActionResult> GetAll(int? id)
         {
             var CompanyUsers = await _unitOfWork.CompanyUsers.GetFirstOrDefaultAsync(uc => uc.CompanyId == id);
             var CompanyId = CompanyUsers.CompanyId;
 
             var companyUsers = await _unitOfWork.CompanyUsers
-                .GetAllUsers(CompanyId);
+                .GetAllUsers(CompanyId, "employee");
 
             return Json(new { data = companyUsers });
         }
 
 
+        [HttpPost]
+        [Authorize(Roles = SD.Role_SuperAdmin)]
+        public async Task<JsonResult> GetEmployeeList(int id, string? status)
+        {
+           
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var draw = Request.Form["draw"].FirstOrDefault();
+            var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault();
+            var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+            var searchValue = Request.Form["search[value]"].FirstOrDefault();
+            int pageSize = Convert.ToInt32(Request.Form["length"].FirstOrDefault() ?? "0");
+            int skip = Convert.ToInt32(Request.Form["start"].FirstOrDefault() ?? "0");
+
+            var data = await _unitOfWork.CompanyUsers
+                .GetAllUsers(id, status);
+
+            if (status == "employees")
+            {
+                 data = await _unitOfWork.CompanyUsers
+                    .GetAllUsers(id, "Employee");
+            } else if(status == "admins")
+            {
+                 data = await _unitOfWork.CompanyUsers
+                    .GetAllUsers(id, "Company Admin");
+            }
+
+            totalRecord = data.Count();
+
+            if (!string.IsNullOrEmpty(searchValue))
+            {
+                data = data.Where(x => x.Name.ToLower().Contains(searchValue.ToLower()) || x.Email.ToLower().Contains(searchValue.ToLower()));
+            }
+
+            filterRecord = data.Count();
+
+            if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
+            {
+                data = data.OrderBy(sortColumn + " " + sortColumnDirection);
+            }
+
+
+            var empList = data.Skip(skip).Take(pageSize).ToList();
+
+            var returnObj = new
+            {
+                draw = draw,
+                recordsTotal = totalRecord,
+                recordsFiltered = filterRecord,
+                data = empList
+            };
+
+            return Json(returnObj);
+        }
+
+
+        // Delete company user 
         [HttpDelete]
+        [Authorize(Roles = SD.Role_SuperAdmin)]
         public async Task<IActionResult> Delete(string? userId, int? id)
         {
             var userFromDb = await _unitOfWork.ApplicationUser.GetFirstOrDefaultAsync(x => x.Id == userId);

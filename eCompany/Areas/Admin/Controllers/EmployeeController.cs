@@ -8,11 +8,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
+using System.Linq.Dynamic.Core;
 using static eCompany.Areas.Identity.Pages.Account.LoginModel;
+using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
 
 namespace eCompany.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin + "," + SD.Role_SuperAdmin)]
     public class EmployeeController : Controller
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -20,6 +25,7 @@ namespace eCompany.Areas.Admin.Controllers
         private readonly ApplicationDbContext _db;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IWebHostEnvironment _hostEnvironment;
+        private readonly IMapper _mapper;
         [TempData]
         public string? StatusMessage { get; set; }
 
@@ -27,68 +33,47 @@ namespace eCompany.Areas.Admin.Controllers
                                   ApplicationDbContext db,  
                                   UserManager<IdentityUser> userManager, 
                                   RoleManager<IdentityRole> roleManager,
-                                  IWebHostEnvironment hostEnvironment)
+                                  IWebHostEnvironment hostEnvironment,
+                                  IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _db = db;
             _userManager = userManager;
             _roleManager = roleManager;
             _hostEnvironment = hostEnvironment;
+            _mapper = mapper;
         }
         public async Task<IActionResult> Index()
         {
              var claimsIdentity = (ClaimsIdentity)User.Identity;
              var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
 
-             var CompanyUsers = await _unitOfWork.CompanyUsers.GetFirstOrDefaultAsync(uc => uc.UserId == claim.Value);
+            var companyDetails = await _unitOfWork.CompanyUsers.GetCompanyDetails(claim.Value);
 
-             var companyDetails = await _unitOfWork.Company.GetFirstOrDefaultAsync(c => c.CompanyId == CompanyUsers.CompanyId);
+            var companyDetailsModel = _mapper.Map<CompanyDTO>(companyDetails);
 
-             return View(companyDetails);
+            return View(companyDetailsModel);
         }
 
         //GET
+        [HttpGet]
         public async Task<IActionResult> Update(string id)
         {   
 
             var employee = await _unitOfWork.ApplicationUser.GetFirstOrDefaultAsync(u => u.Id == id);
             var userRoles = await _userManager.GetRolesAsync(employee);
 
-            var userName = await _userManager.GetUserNameAsync(employee);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(employee);
+            var userFromDb_eg = await _unitOfWork.CompanyUsers.GetUserProfile(employee.Id);
+            var userProfileModel = _mapper.Map<ApplicationUserDTO>(userFromDb_eg);
 
-
-
-            var userFromDb = await _unitOfWork.CompanyUsers.GetUserProfile(employee.Id);
-            userFromDb.Role = userRoles[0];
-
-
-
-            ApplicationUserDTO userEmployee = new ApplicationUserDTO
+            userProfileModel.Role = userRoles[0];
+            userProfileModel.RoleList = _roleManager.Roles.Where(r => r.Name != SD.Role_SuperAdmin).Select(x => x.Name).Select(i => new SelectListItem
             {
-                        Id = id,
-                        Name = userFromDb.Name,
-                        City = userFromDb.City,
-                        State = userFromDb.State,
-                        Email = userName,
-                        ImageUrl = userFromDb.ImageUrl,
-                        Sex = userFromDb.Sex,
-                        PhoneNumber = phoneNumber,
-                        Role = userFromDb.Role,
-                        CompanyName = userFromDb.CompanyName,
-                        RoleList = _roleManager.Roles.Where(r => r.Name != SD.Role_SuperAdmin).Select(x => x.Name).Select(i => new SelectListItem
-                        {
-                            Text = i,
-                            Value = i
-                        })
+                Text = i,
+                Value = i
+            });
 
-                };
-            
-
-            
-
-
-            return View(userEmployee);
+            return View(userProfileModel);
         }
 
 
@@ -107,7 +92,7 @@ namespace eCompany.Areas.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
-                return RedirectToAction("Update", applicationUser.Id);
+                return RedirectToAction("Update", new { id = applicationUser.Id });
             }
 
 
@@ -239,10 +224,63 @@ namespace eCompany.Areas.Admin.Controllers
             var CompanyId = CompanyUsers.CompanyId;
 
             var companyUsers = await _unitOfWork.CompanyUsers
-                .GetAllUsers(CompanyId);
+                .GetAllUsers(CompanyId, "employee");
 
             return Json( new { data = companyUsers });
         }
+
+
+
+        [HttpPost]
+        public async Task<JsonResult> GetEmployeeList(string? status)
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+            var CompanyUsers = await _unitOfWork.CompanyUsers.GetFirstOrDefaultAsync(uc => uc.UserId == claim.Value);
+            var CompanyId = CompanyUsers.CompanyId;
+
+            int totalRecord = 0;
+            int filterRecord = 0;
+            var draw = Request.Form["draw"].FirstOrDefault();
+            var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault();
+            var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+            var searchValue = Request.Form["search[value]"].FirstOrDefault();
+            int pageSize = Convert.ToInt32(Request.Form["length"].FirstOrDefault() ?? "0");
+            int skip = Convert.ToInt32(Request.Form["start"].FirstOrDefault() ?? "0");
+            var data = await _unitOfWork.CompanyUsers
+                .GetAllUsers(CompanyId, status);
+
+            totalRecord = data.Count();
+
+            if (!string.IsNullOrEmpty(searchValue))
+            {
+                data = data.Where(x => x.Name.ToLower().Contains(searchValue.ToLower()) || x.Email.ToLower().Contains(searchValue.ToLower()));
+            }
+
+            filterRecord = data.Count();
+
+            if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
+            {
+                data = data.OrderBy(sortColumn + " " + sortColumnDirection);
+            }
+
+
+            var empList = data.Skip(skip).Take(pageSize).ToList();
+
+
+            var returnObj = new
+            {
+                draw = draw,
+                recordsTotal = totalRecord,
+                recordsFiltered = filterRecord,
+                data = empList
+            };
+
+            return Json(returnObj);
+        }
+
+
 
 
         [HttpDelete]

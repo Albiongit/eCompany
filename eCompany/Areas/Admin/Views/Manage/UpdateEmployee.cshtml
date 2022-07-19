@@ -36,7 +36,7 @@
                     </div>
                     <br />
                     <div class="form-floating">
-                        <input asp-for="Email" class="form-control" disabled/>
+                        <input asp-for="Email" class="form-control" readonly/>
                         <label asp-for="Email" class="form-label"></label>
                     </div>
                     <br />
@@ -66,7 +66,7 @@
                     @if(Model.CompanyName != null)
                     {
                         <div class="form-floating">
-                        <input asp-for="CompanyName" class="form-control" disabled/>
+                        <input asp-for="CompanyName" class="form-control" readonly/>
                         <label asp-for="CompanyName" class="form-label"></label>
                         <span asp-validation-for="CompanyName" class="text-danger"></span>
                     </div>

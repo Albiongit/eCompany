@@ -11,5 +11,7 @@ namespace eCompany.Shared
         public const string Role_SuperAdmin = "Super Admin";
         public const string Role_Admin = "Company Admin";
         public const string Role_Employee = "Employee";
+
+
     }
 }

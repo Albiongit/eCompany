@@ -7,11 +7,20 @@
     <title>@ViewData["Title"] - eCompany</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
-    @*<link rel="stylesheet" href="~/css/bootswatch.css" />*@
     <link rel="stylesheet" href="//cdn.datatables.net/1.11.2/css/jquery.dataTables.min.css" />
+    <link href="~/lib/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="https://raw.githack.com/ttskch/select2-bootstrap4-theme/master/dist/select2-bootstrap4.css" rel="stylesheet">
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
-    <link rel="stylesheet" href="~/eCompany.styles.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.js"></script>
+
+    <style>
+        .dropdown-toggle::after {
+            content: none;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -25,25 +34,44 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="Customer" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-light" asp-area="Customer" asp-controller="Home" asp-action="Index">@sharedResource["Home"]</a>
                         </li>
                         @if(User.IsInRole(SD.Role_Admin))
                         {
                             <li class="nav-item dropdown">
                                     <a class="nav-link text-light dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        My Company
+                                        @sharedResource["MyCompany"]
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                        <a class="dropdown-item text-light" asp-area="Admin" asp-controller="Employee" asp-action="Index">Employees</a>
-                                        <a class="dropdown-item text-light" asp-area="" asp-controller="" asp-action="">Other</a>
-
+                                        <a class="dropdown-item text-light" asp-area="Admin" asp-controller="Company" asp-action="GetCompany">@sharedResource["Company"]</a>
+                                        <a class="dropdown-item text-light" asp-area="Admin" asp-controller="Employee" asp-action="Index">@sharedResource["Employees"]</a>
+                                        <a class="dropdown-item text-light" asp-area="Admin" asp-controller="Task" asp-action="Index">@sharedResource["Tasks"]</a>
+                                        <a class="dropdown-item text-light" asp-area="Customer" asp-controller="Language" asp-action="Change" asp-route-culture="en-US" >EN</a>
                                     </div>
                             </li>
                         }
                         @if(User.IsInRole(SD.Role_SuperAdmin))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-light" asp-area="Admin" asp-controller="Company" asp-action="Index">Companies</a>
+                                <a class="nav-link text-light" asp-area="Admin" asp-controller="Company" asp-action="Index">@sharedResource["Companies"]</a>
+                            </li>
+                            <li class="nav-item">
+                                <a id="register" class="nav-link text-light" asp-area="Identity" asp-page="/Account/Register" >@sharedResource["RegisterNew"]</a>
+                            </li>
+                        }
+                        @if (User.IsInRole(SD.Role_Employee))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-light" asp-area="Customer" asp-controller="Task" asp-action="Index">@sharedResource["Tasks"]</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-light dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+                                    <i class="far fa-bell" id="taskCount"> </i>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown" id="notification">
+                                       @*notifications*@
+
+                                </div>
                             </li>
                         }
                     </ul>
@@ -61,8 +89,21 @@
 
     <footer class="border-top footer text-muted bg-dark">
         <div class="container">
-            &copy; 2022 - eCompany - <a asp-area="Customer" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            
+            <div style="float:left">
+                &copy; 2022 - eCompany - <a asp-area="Customer" asp-controller="Home" asp-action="Privacy">@sharedResource["Privacy"]</a>
+            </div>
+            <div style="float:right" class="p-1 pt-0">
+                <a class="text-light" style="text-decoration:none" asp-area="Customer" asp-controller="Language" asp-action="Change" asp-route-culture="de-DE" >DE</a>
+            </div>
+            <div style="float:right" class="p-1 pt-0">
+                <a class="text-light" style="text-decoration:none" asp-area="Customer" asp-controller="Language" asp-action="Change" asp-route-culture="en-US" >EN</a>
+            </div>
+            <div style="float:right" class="p-1 pt-0">
+                Languages : 
+            </div>
         </div>
+        
     </footer>
     <script src="~/lib/jquery/dist/jquery.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -70,7 +111,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://kit.fontawesome.com/e19c476714.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="~/lib/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="https://raw.githack.com/ttskch/select2-bootstrap4-theme/master/dist/select2-bootstrap4.css" rel="stylesheet">
 	<script src="//cdn.datatables.net/1.11.2/js/jquery.dataTables.min.js"></script>
+    <script src="~/js/checkData.js"></script>
+    <script src="~/js/Common.js"></script>
+    <script src="~/js/notifications.js"></script>
+    <script src="~/lib/chart.js/dist/chart.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

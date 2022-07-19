@@ -1,3 +1,8 @@
-﻿@using eCompany
+﻿@using Microsoft.Extensions.Localization
+@using eCompany
 @using eCompany.Models
+
+@inject IStringLocalizer<SharedResource> sharedResource
+
+
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers

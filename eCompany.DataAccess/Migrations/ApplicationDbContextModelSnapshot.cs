@@ -72,6 +72,53 @@ namespace eCompany.DataAccess.Migrations
                     b.ToTable("Companies_Users");
                 });
 
+            modelBuilder.Entity("eCompany.Models.TaskEntity", b =>
+                {
+                    b.Property<int>("TaskId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TaskId"), 1L, 1);
+
+                    b.Property<DateTime>("AssignedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CompanyID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DayDuration")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EmployeeId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("FinishedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("TaskId");
+
+                    b.HasIndex("CompanyID");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("Tasks");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -223,12 +270,10 @@ namespace eCompany.DataAccess.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -265,12 +310,10 @@ namespace eCompany.DataAccess.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -285,6 +328,7 @@ namespace eCompany.DataAccess.Migrations
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
                     b.Property<string>("City")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
@@ -299,6 +343,7 @@ namespace eCompany.DataAccess.Migrations
                         .HasColumnType("nvarchar(1)");
 
                     b.Property<string>("State")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("ApplicationUser");
@@ -321,6 +366,25 @@ namespace eCompany.DataAccess.Migrations
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("eCompany.Models.TaskEntity", b =>
+                {
+                    b.HasOne("eCompany.Models.Company", "Company")
+                        .WithMany("Tasks")
+                        .HasForeignKey("CompanyID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("eCompany.Models.ApplicationUser", "Employee")
+                        .WithMany("Tasks")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -377,11 +441,15 @@ namespace eCompany.DataAccess.Migrations
             modelBuilder.Entity("eCompany.Models.Company", b =>
                 {
                     b.Navigation("Company_Users");
+
+                    b.Navigation("Tasks");
                 });
 
             modelBuilder.Entity("eCompany.Models.ApplicationUser", b =>
                 {
                     b.Navigation("Company_Users");
+
+                    b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618
         }

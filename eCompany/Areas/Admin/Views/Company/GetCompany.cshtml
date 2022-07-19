@@ -1,0 +1,62 @@
+﻿@using eCompany.Models.DTOs.Entities
+@model CompanyDTO
+
+<div class="container p-3">
+    
+    <div class="row pt-4">
+		<div class="col-12" style="text-align:center">
+			<h1 class="text-primary">@Model.CompanyName - @sharedResource["Company"]</h1>
+		</div>
+	</div>
+	<br />
+
+	<div class="col-8">
+	<form method="post" asp-controller="Company" asp-action="UpdateCompany" enctype="multipart/form-data">
+			<input asp-for="CompanyId" hidden />
+			<div class="row p-3 border">
+				<h3>Update Company</h3>
+				<div asp-validation-summary="All"></div>
+				<div class="col-8 pt-4" >
+					<div class="form-floating" style="text-align:center">
+						<input asp-for="CompanyName" class="form-control" />
+						<label asp-for="CompanyName" class="form-label"></label>
+						<span asp-validation-for="CompanyName" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="col-8 pt-4">
+					<div class="form-floating">
+						<input asp-for="CompanyPhone" class="form-control" />
+						<label asp-for="CompanyPhone" class="form-label"></label>
+						<span asp-validation-for="CompanyPhone" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="col-8 pt-4">
+					<div class="form-floating">
+						<input asp-for="CompanyState" class="form-control" />
+						<label asp-for="CompanyState" class="form-label"></label>
+						<span asp-validation-for="CompanyState" class="text-danger"></span>
+					</div>
+				</div>
+				<div class="col-8 pt-4">
+					<div class="form-floating">
+						<input asp-for="CompanyWeb" class="form-control" />
+						<label asp-for="CompanyWeb" class="form-label"></label>
+						<span asp-validation-for="CompanyWeb" class="text-danger"></span>
+					</div>
+				</div>
+				<br />
+				<div class="col-12 pt-4">
+				
+					<button type="submit" class="btn btn-primary" style="width:150px">@sharedResource["Update"]</button>
+					
+					<a asp-area="Customer" asp-controller="Home" asp-action="Index" class="btn btn-secondary" style="width:150px">
+						@sharedResource["BackHome"]
+					</a>
+				</div>
+
+			</div>
+			
+		</form>
+		</div>
+
+</div>
